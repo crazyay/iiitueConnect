@@ -1,0 +1,14 @@
+*{
+    box-sizing: border-box;
+    padding: 0;
+}
+.img{
+    background-image: url("iiitu.jpg");
+    background-size: cover;
+    height:80vh;
+}
+.branchimg{
+    background-image: url("IIIT-Una.jpg");
+    background-size: cover;
+    height:80vh;
+}
