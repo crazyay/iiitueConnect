@@ -15,6 +15,8 @@ import Home from './components/Home';
 import Complaint from './components/Compalaints';
 import AcademicRegistration from './components/AcademicRegistration';
 import HostelReg from './components/HostelReg';
+import Login from './components/Login';
+import Private from './components/Private'
 function App() {
   const placements = [
     { name: 'Student A', company: 'Company A', package: '$100,000', logo:apple },
@@ -31,6 +33,7 @@ function App() {
   <Nav />
   <Header />
   <Routes>
+  <Route element={<Private />}>
   <Route path='/' element={<Home/>} />
    <Route path='/gallery' element={<Gallery/>} />
    <Route path='/Placements' element={<Placements placements={placements}/>} />
@@ -39,11 +42,13 @@ function App() {
    <Route path='/Complaint/:page' element={<Complaint   />} />
    <Route path="/Registration/Academic" element={<AcademicRegistration/>}/> 
    <Route path="/Registration/Hostel" element={<HostelReg/>}/> 
-   
+   </Route>
+   <Route path='Login' element= {<Login/>} />
   </Routes>
   <Footer />
     </BrowserRouter>
     </div>
   );
 }
+
 export default App;

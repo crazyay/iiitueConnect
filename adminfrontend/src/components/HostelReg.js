@@ -71,12 +71,12 @@ export default function HostelReg(){
 
   return (
     <div>
-    <h1 className=" text-center font-bold text-5xl text-green-700 tracking-wider " style={{textShadow:"2px 2px 4px #000000"}}>Registered students Details</h1>
+    <h1 className=" text-center font-bold text-4xl text-green-700 tracking-wider " style={{textShadow:"2px 2px 4px #000000"}}>Registered students Details</h1>
 
-<div className="flex justify-evenly p-10" >
+<div className="flex flex-wrap justify-evenly p-10" >
 
 { data.length>0? data.map((item,index)=> { return(
-<div className="text-white font-medium p-4 w-[300px] bg-slate-500">
+<div className="text-white font-medium mb-4 p-4 w-[300px] bg-slate-500">
 <p>Roll_no: {item.rollno}</p> 
 <p>Batch: {item.batch}</p> 
 <p>Semester: {item.semester}</p> 
@@ -109,7 +109,7 @@ export default function HostelReg(){
 </div>
 )
 }):<div className="w-full h-[29vh]">
-<h1 className=" text-center font-bold text-5xl text-green-700 tracking-wider " style={{textShadow:"2px 2px 4px #000000"}}>No Record Found</h1>
+<h1 className=" text-center font-bold text-4xl text-green-700 tracking-wider " style={{textShadow:"2px 2px 4px #000000"}}>No Record Found</h1>
 </div>
 }
 </div>

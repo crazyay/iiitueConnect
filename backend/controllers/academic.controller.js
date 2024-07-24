@@ -17,8 +17,8 @@ const storage1 = multer.diskStorage({
 const academicRegistration=async(req,res)=>{
     try {
         // Log form data and file data
-        console.log("Form Data:", req.body);
-        console.log("File Data:", req.file);
+        // console.log("Form Data:", req.body);
+        // console.log("File Data:", req.file);
     
         // Create a new hostelmodel instance with form data and file information
         const data = new academicmodel({
@@ -33,7 +33,7 @@ const academicRegistration=async(req,res)=>{
         res.status(200).send("File uploaded successfully!");
     } catch (error) {
         // Handle errors
-        console.error("Error uploading file:", error);
+        // console.error("Error uploading file:", error);
         res.status(500).send("Error uploading file: " + error.message);
     }
 }
@@ -56,31 +56,31 @@ const getAcademicRegistrations=async(req,res)=>{
         if (rollno) {
           registrations = registrations.filter((registration) => registration.rollno.toLowerCase().includes(rollno.toLowerCase()));
         }
-         console.log(registrations);
+        //  console.log(registrations);
         res.json(registrations);
       } catch (error) {
-        console.error("Error fetching registrations:", error);
+        // console.error("Error fetching registrations:", error);
         res.status(500).json({ error: "Internal server error" });
       }
 }
 const academicRegApproved=async(req,res)=>{
-    console.log("hello");
-    console.log(req.params.id);
+    // console.log("hello");
+    // console.log(req.params.id);
        const response=await academicmodel.findByIdAndUpdate(req.params.id, {$set:{status:true}},{new:true})
-       console.log(response);     
+      //  console.log(response);     
       res.json("Academic Registration approved")
 }
 
 const applicationform=async(req,res)=>{
     try{
 
-        console.log(req.body);
+        // console.log(req.body);
         const data=new applicationmodel(req.body);
         const datasaved= await data.save()
         res.status(200).send("succes")
       }
       catch(error){
-        console.error(error);
+        // console.error(error);
         res.status(500).send(error.message);
       }
 }
@@ -90,7 +90,7 @@ const getApplications=async(req,res)=>{
             // console.log(applications);
             res.json(applications);
           } catch (error) {
-            console.error("Error fetching applications:", error);
+            // console.error("Error fetching applications:", error);
             res.status(500).json({ error: "Error fetching applications" });
           }
 }

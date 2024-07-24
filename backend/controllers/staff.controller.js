@@ -1,10 +1,9 @@
-const User=require('../models/user');
+const Staff=require('../models/staffmodel.js');
 
 const generateAccessAndRefreshToken=async(userId )=>{
     try {
-      const user=await User.findById(userId);
+      const user=await Staff.findById(userId);
     if(!user){
-
     throw new Error(500,"server error");
    }
    const accessToken=await user.generateAccessToken();
@@ -31,16 +30,16 @@ const registerUser=async(req,res)=>{
     if (emailDomain !== 'iiitu.ac.in') {
       return res.status(400).json({ success: false, message: "Only iiitu.ac.in email addresses are allowed" });
     }
-  const existedUser=await User.findOne( {email})
+  const existedUser=await Staff.findOne( {email})
    if(existedUser){
     return Error(409,"User already with username or email exist");
    }
   
-  const user= await User.create({
+  const user= await Staff.create({
       email,
       password,
   });
-  const createduser=await User.findById(user._id).select(
+  const createduser=await Staff.findById(user._id).select(
     "-password -refreshToken")
   
     if(!createduser){
@@ -59,7 +58,7 @@ if(!(email)){
   return res.status(401).json({ success: false, message: 'Authentication failed' });
 }
 
-const user=await User.findOne({email})
+const user=await Staff.findOne({email})
 if(!user){ 
 // console.log("1");
 
@@ -75,7 +74,7 @@ const validuser=await user.isPasswordCorrect(password);
  }
  
 const {accessToken,refreshToken} =await generateAccessAndRefreshToken(user._id);
-const loggedInUser=await User.findById(user._id).select("-password -refreshToken") 
+const loggedInUser=await Staff.findById(user._id).select("-password -refreshToken") 
  //instead of one call to db just simply update the user object with the 
  // new refreshToken which is generated after user call 
 // user.refreshToken=refreshToken 

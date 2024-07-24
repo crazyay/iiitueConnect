@@ -96,7 +96,7 @@ export default function Application() {
       { applications.length > 0 ?
          applications.map((app) => (
               
-          <div key={app._id} className="h-fit w-[300px] gap-4 m-3 p-6 bg-[#FFEBB2]">
+          <div key={app._id} className="h-fit w-[300px] mb-4 gap-4 m-3 p-6 bg-[#FFEBB2]">
          
                <div className="flex justify-between font-medium">
                <span> {new Date(app.createdAt).toDateString()}</span>

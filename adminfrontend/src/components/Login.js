@@ -16,7 +16,7 @@ function Login() {
     });
 
     const collectData = async () => {
-        let response = await fetch('http://localhost:8000/users/Login', {
+        let response = await fetch('http://localhost:8000/staff/Login', {
             method: 'post',
             body: JSON.stringify({ email, password }),
             headers: {
@@ -25,7 +25,7 @@ function Login() {
         });
       
        let result = await response.json();
-        console.log(result); 
+        console.log(result);
       
         if (response.ok) {
             student_name = result.email; // Assuming there is a 'name' field in the user object

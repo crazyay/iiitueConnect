@@ -15,25 +15,26 @@ export default function Nav() {
        navigate('/Login');
     }
 const auth=localStorage.getItem('user');
-const {rollNo}=auth?JSON.parse(auth):{rollNo:null};
-console.log(rollNo);
+const {email}=auth?JSON.parse(auth):{rollNo:null};
+
 useEffect(()=>{
- setrollno(rollNo);
+ setrollno(email);
 },[rollno]);
     return (
            <div className="sticky top-0">
-                <ul className="flex space-x-6  dark:bg-gray-900 pl-4 items-center p-2 text-white">
-                    <li className="text-xl font-bold font-serif"><NavLink to={"/"}><Logo /></NavLink></li>
+                <ul className="flex justify-between dark:bg-gray-900 pl-4 items-center p-2 text-white">
+                    <div className="flex items-center ">
+                    <li className="text-xl mr-2 font-bold font-serif"><NavLink to={"/"}><Logo /></NavLink></li>
                     <li className="text-xl font-bold font-serif" ><NavLink to={"/"}>IIIT Una</NavLink></li>
+                    </div>
                   
-                  
-                    {/* <li className="text-xl font-bold font-serif">{rollno}</li> */}
-                    <li className="pl-96 font-bold font-serif">  
+                    
+                    <li className=" relative  mr-0 font-bold font-serif">  
                     {auth?(  <>
+     <span className="text-white px-4">{rollno}</span>
     <NavLink onClick={logout} to="/Login">
-      <span className=""> Logout </span>
+      <span className="text-white px-4"> Logout </span>
     </NavLink>
-    <span className="text-white px-4">{rollno}</span>
   </> )
                     :(<NavLink  to={"/Login"}><span className=""> Login </span></NavLink>)} 
                      </li>

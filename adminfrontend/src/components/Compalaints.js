@@ -61,7 +61,7 @@ export default function Complaint(){
 
 
   return (
-    <div className="flex flex-wrap justify-evenly  m-8">
+    <div className="flex flex-wrap justify-evenly ">
  {complaint.length > 0? (
     complaint.map((item,index)=>{
     return(<div className="h-fit w-[300px]  gap-4 m-3 p-6 bg-[#FFEBB2]">

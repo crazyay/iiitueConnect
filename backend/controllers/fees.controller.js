@@ -4,7 +4,7 @@ const stripe = new Stripe("sk_test_51ON9vwSIUs4beRKmyBG9eMRRVQn53TT4lWBSOjk1VQe4
 
 const feePayment=async(req,res)=>{
     const { amount, email, semester,paymentMethod } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -26,21 +26,21 @@ const feePayment=async(req,res)=>{
       customer_email: email,
     });
     res.json({ id: session.id });
-    console.log(session);
+    // console.log(session);
   } catch (error) {
-    console.error("Error creating checkout session:", error);
+    // console.error("Error creating checkout session:", error);
     res.status(500).json({ error: "Unable to create checkout session" });
   }
 }
 
 const successPayment=async(req,res)=>{
     const { sessionId } = req.body;
-    console.log("sessioid");
+    // console.log("sessioid");
       console.log(sessionId);
     try {
       // Retrieve the Checkout session using the session ID
       const session = await stripe.checkout.sessions.retrieve(sessionId);
-      console.log(session);
+      // console.log(session);
       // Check if the payment was successful
       // if (session.payment_status === 'paid') {
         // Payment was successful, send email to the user
@@ -50,7 +50,7 @@ const successPayment=async(req,res)=>{
           subject: 'Payment Confirmation',
           text: 'Thank you for your payment. Your payment was successful.'
         };
-          console.log(session.customer_details.email);
+          // console.log(session.customer_details.email);
   
         // Call your email sending middleware to send the email
           await MailOnSuccessfulPayment(emailData);
@@ -61,7 +61,7 @@ const successPayment=async(req,res)=>{
       //   res.status(400).json({ error: 'Payment not successful.' });
       // }
     } catch (error) {
-      console.error('Error processing payment:', error);
+      // console.error('Error processing payment:', error);
       res.status(500).json({ error: 'Internal server error.' });
     }
 }

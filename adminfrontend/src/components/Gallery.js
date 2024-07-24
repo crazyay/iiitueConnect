@@ -37,8 +37,8 @@ function Gallery() {
 
 function GalleryItem({ src, caption }) {
   return (
-    <figure>
-      <img src={src} alt="" />
+    <figure className=' min-h-36'>
+      <img src={src}  alt="" />
       <figcaption>{caption}</figcaption>
     </figure>
   );

@@ -15,8 +15,8 @@ const upload = multer({ storage: storage });
 const hostelRegistration=async(req,res)=>{
     try {
         // Log form data and file data
-        console.log("Form Data:", req.body);
-        console.log("File Data:", req.file);
+        // console.log("Form Data:", req.body);
+        // console.log("File Data:", req.file);
         // Create a new hostelmodel instance with form data and file information
         const data = new hostelmodel({
             ...req.body, // Include form fields
@@ -30,7 +30,7 @@ const hostelRegistration=async(req,res)=>{
         res.status(200).send("File uploaded successfully!");
     } catch (error) {
         // Handle errors
-        console.error("Error uploading file:", error);
+        // console.error("Error uploading file:", error);
         res.status(500).send("Error uploading file: " + error.message);
     }
 }
@@ -40,7 +40,7 @@ const getHostelRegistration=async(req,res)=>{
 }
 const complaints=async(req,res)=>{
     const data=await req.body;
-  console.log(data);
+  // console.log(data);
   const complaintdata=new complaintmodel(data);
   const result=await complaintdata.save();
   res.send("complaint registered");
@@ -48,20 +48,20 @@ const complaints=async(req,res)=>{
 const getComplaints=async(req,res)=>{
     try {
         const pa=req.params.page;
-        console.log(pa);
+        // console.log(pa);
         const complaint = await complaintmodel.find({type:{ $regex: new RegExp(req.params.page, "i") }}).sort({createdAt: 1 });
-        console.log("complaint");
-        console.log(complaint);
+        // console.log("complaint");
+        // console.log(complaint);
         res.json(complaint);  
       } catch (error) {
-        console.error("Error fetching complaints:", error);
+        // console.error("Error fetching complaints:", error);
         res.status(500).json({ error: "Error fetching complaints" });
       }
 }
 const hostelRegistrationApproved=async(req,res)=>{
-    console.log(req.params.id);
+    // console.log(req.params.id);
     const response=await hostelmodel.findByIdAndUpdate(req.params.id, {$set:{status:true}},{new:true})
-    console.log(response);     
+    // console.log(response);     
    res.json("Hostel Registration approved")
 }
 const complaintResolved=async(req,res)=>{

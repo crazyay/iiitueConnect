@@ -151,7 +151,7 @@ const handleCommentChange = (e, id) => {
 
 return (
   <div className=" ">
-    <h1 className="text-center font-bold text-5xl text-green-700 tracking-wider" style={{ textShadow: "2px 2px 4px #000000" }}>Registered students Details</h1>
+    <h1 className="text-center font-bold text-4xl text-green-700 tracking-wider" style={{ textShadow: "2px 2px 4px #000000" }}>Registered students Details</h1>
 
     <div className=" p-4 ">
       <input
@@ -163,10 +163,10 @@ return (
       />
     </div>
 
-    <div className="flex justify-evenly  p-10">
+    <div className="flex flex-wrap justify-evenly  p-10">
       {filteredData.length > 0 ? (
         filteredData.map((item, index) => (
-          <div className="text-white font-medium p-4 w-[300px] bg-slate-500" key={item._id}>
+          <div className="text-white font-medium p-4  mb-4  w-[300px] bg-slate-500" key={item._id}>
             <p>Roll_no: {item.rollno}</p>
             <p>Email: {item.email}</p>
             <div className="flex flex-col">
