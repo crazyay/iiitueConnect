@@ -24,6 +24,7 @@ import Gallery from './components/Gallery';
 import Success from './components/Success';
 import Failure from  './components/Failure'
 import Header from './components/Header';
+import Changepassword from './components/ChangePassword';
 function App() {
   const placements = [
     { name: 'Student A', company: 'Company A', package: 'Rs.15,00,000', logo:apple },
@@ -55,7 +56,8 @@ function App() {
           <Route path='/gallery' element= {<Gallery />} />
           <Route path='/success' element= {<Success />} />
           <Route path='/failure' element= {<Failure />} />
-
+          <Route path='/changepassword' element= {<Changepassword />} />
+           
 
           <Route path='/application' element= {<Application/>} />
           </Route>

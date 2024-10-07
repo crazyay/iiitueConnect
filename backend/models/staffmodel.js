@@ -2,6 +2,8 @@
 const mongoose=require('mongoose')
 const bcrypt =require('bcrypt')
 const jwt=require('jsonwebtoken')
+const {asyncHandler}=require('../utils/asyncHandler')
+
 const staffSchema=mongoose.Schema({ 
     email:String,
     password:String,
@@ -19,7 +21,7 @@ staffSchema.pre("save",async function(next){
  staffSchema.methods.isPasswordCorrect=async function(password){
     return await bcrypt.compare(password,this.password);
  }
- staffSchema.methods.generateAccessToken= async function(){
+ staffSchema.methods.generateAccessToken=async function(){
  return await jwt.sign({
        _id:this._id,
         email:this.email,
@@ -31,7 +33,7 @@ staffSchema.pre("save",async function(next){
     }
     )
  }
- staffSchema.methods.generateRefreshToken= async function(){
+ staffSchema.methods.generateRefreshToken=async function(){
     return await jwt.sign({
        _id:this._id,
     },

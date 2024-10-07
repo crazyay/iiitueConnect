@@ -1,10 +1,12 @@
 const Staff=require('../models/staffmodel.js');
+const {apiError}=require('../utils/apiError')
+const {asyncHandler}=require('../utils/asyncHandler')
 
 const generateAccessAndRefreshToken=async(userId )=>{
     try {
       const user=await Staff.findById(userId);
     if(!user){
-    throw new Error(500,"server error");
+    throw new apiError(500,"server error");
    }
    const accessToken=await user.generateAccessToken();
    const refreshToken=await user.generateRefreshToken();
@@ -15,16 +17,33 @@ const generateAccessAndRefreshToken=async(userId )=>{
   
       
     } catch (error) {
-      throw new Error(500,"error while generating tokens")
+      throw new apiError(500,"error while generating tokens")
     }
   
    
   }
-
-const registerUser=async(req,res)=>{
+  const updateUserPassword=asyncHandler(async(req,res)=>{
+    const {oldPassword,newPassword}=req.body;
+    if(!oldPassword||!newPassword){
+      throw new apiError(400,"details are must");
+    }
+    const user=await User.findById(req.user?._id)
+    if(!user){
+      throw new apiError(401,"User not found");
+    }
+    const isPasswordCorrect=user.isPasswordCorrect(oldPassword);
+    if(!isPasswordCorrect){
+      throw new apiError(400,"Password is wrong")
+    }
+    user.password=newPassword;
+      await user.save({validateBeforeSave:false});
+      return res.status(200)
+      .json(new apiResponse(200,{},"password updated"))
+  })
+const registerUser=asyncHandler(async(req,res)=>{
     const {email, password}=req.body;
     if([email,password].some((field)=>field?.trim()==="")){
-       return Error(400,"All fields are required")
+       return new apiError(400,"All fields are required")
     }
     const emailDomain = email.split('@')[1];
     if (emailDomain !== 'iiitu.ac.in') {
@@ -32,10 +51,11 @@ const registerUser=async(req,res)=>{
     }
   const existedUser=await Staff.findOne( {email})
    if(existedUser){
-    return Error(409,"User already with username or email exist");
+    throw new apiError(409,"User already with username or email exist");
    }
   
   const user= await Staff.create({
+    
       email,
       password,
   });
@@ -43,15 +63,15 @@ const registerUser=async(req,res)=>{
     "-password -refreshToken")
   
     if(!createduser){
-        throw new Error(500,"user is not registerd!! try again")
+        throw new apiError(500,"user is not registerd!! try again")
     }
   return res.status(201).json(
    { status:200,data:createduser,message:"user registered successfully"
    } )
-}
+})
 
-const loginUser=async(req,res)=>{
-    
+const loginUser=asyncHandler(async(req,res)=>{
+
 // console.log(req.body);
 const {email,password}= req.body;
 if(!(email)){
@@ -87,11 +107,11 @@ const options={
                     // by using this options we can allows tokens to be
   httpOnly:true,  // only modifiable from server not from client side
   secure:true
-}
+} 
  return res.status(200)
  .cookie("accessToken",accessToken,options)
  .cookie("refreshToken",refreshToken,options)
  .json(loggedInUser)
 
-}
-module.exports = { registerUser,loginUser };
+})
+module.exports = { registerUser,loginUser,updateUserPassword };

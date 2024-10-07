@@ -1,5 +1,7 @@
 const hostelmodel=require('../models/hostelmodel')
 const complaintmodel=require('../models/complaintsmodel')
+const {asyncHandler}=require('../utils/asyncHandler')
+
 const multer = require('multer')
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -12,7 +14,7 @@ const storage = multer.diskStorage({
   });
 const upload = multer({ storage: storage });
 
-const hostelRegistration=async(req,res)=>{
+const hostelRegistration=asyncHandler(async(req,res)=>{
     try {
         // Log form data and file data
         // console.log("Form Data:", req.body);
@@ -33,19 +35,19 @@ const hostelRegistration=async(req,res)=>{
         // console.error("Error uploading file:", error);
         res.status(500).send("Error uploading file: " + error.message);
     }
-}
-const getHostelRegistration=async(req,res)=>{
+})
+const getHostelRegistration=asyncHandler(async(req,res)=>{
     const registeredStudents=await hostelmodel.find();
   res.status(200).json(registeredStudents);
-}
-const complaints=async(req,res)=>{
+})
+const complaints=asyncHandler(async(req,res)=>{
     const data=await req.body;
   // console.log(data);
   const complaintdata=new complaintmodel(data);
   const result=await complaintdata.save();
   res.send("complaint registered");
-}
-const getComplaints=async(req,res)=>{
+})
+const getComplaints=asyncHandler(async(req,res)=>{
     try {
         const pa=req.params.page;
         // console.log(pa);
@@ -57,17 +59,17 @@ const getComplaints=async(req,res)=>{
         // console.error("Error fetching complaints:", error);
         res.status(500).json({ error: "Error fetching complaints" });
       }
-}
-const hostelRegistrationApproved=async(req,res)=>{
+})
+const hostelRegistrationApproved=asyncHandler(async(req,res)=>{
     // console.log(req.params.id);
     const response=await hostelmodel.findByIdAndUpdate(req.params.id, {$set:{status:true}},{new:true})
     // console.log(response);     
    res.json("Hostel Registration approved")
-}
-const complaintResolved=async(req,res)=>{
+})
+const complaintResolved=asyncHandler(async(req,res)=>{
     res.status(200).json("complaint resolved and deleted")
     await complaintmodel.findByIdAndDelete(req.params.id);
 }
-
+)
 
 module.exports={hostelRegistration, upload,complaints,getComplaints,getHostelRegistration,hostelRegistrationApproved,complaintResolved}

@@ -2,15 +2,20 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const multer = require("multer");
+const cookieParser = require('cookie-parser');
+
+
 const cors=require("cors")
 require('./db/config')
 const app = express();
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors({ 
-    origin: '*',
+  origin: 'http://localhost:3000',
     optionsSuccessStatus: 200,
+    credentials: true,
 }));
 
 

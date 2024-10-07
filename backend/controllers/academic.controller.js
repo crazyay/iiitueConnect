@@ -1,6 +1,7 @@
 const academicmodel=require('../models/academicmodel')
 const applicationmodel=require('../models/applicationmodel')
 const multer=require('multer')
+const {asyncHandler}=require('../utils/asyncHandler')
 
 const storage1 = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -37,7 +38,7 @@ const academicRegistration=async(req,res)=>{
         res.status(500).send("Error uploading file: " + error.message);
     }
 }
-const getAcademicRegistrations=async(req,res)=>{
+const getAcademicRegistrations=asyncHandler( async(req,res)=>{
     try {
         // Fetch all registrations from the database
         let registrations = await academicmodel.find();
@@ -62,16 +63,16 @@ const getAcademicRegistrations=async(req,res)=>{
         // console.error("Error fetching registrations:", error);
         res.status(500).json({ error: "Internal server error" });
       }
-}
-const academicRegApproved=async(req,res)=>{
+})
+const academicRegApproved=asyncHandler(async(req,res)=>{
     // console.log("hello");
     // console.log(req.params.id);
        const response=await academicmodel.findByIdAndUpdate(req.params.id, {$set:{status:true}},{new:true})
       //  console.log(response);     
       res.json("Academic Registration approved")
-}
+})
 
-const applicationform=async(req,res)=>{
+const applicationform=asyncHandler(async(req,res)=>{
     try{
 
         // console.log(req.body);
@@ -83,8 +84,8 @@ const applicationform=async(req,res)=>{
         // console.error(error);
         res.status(500).send(error.message);
       }
-}
-const getApplications=async(req,res)=>{
+})
+const getApplications=asyncHandler(async(req,res)=>{
     try {
             const applications = await applicationmodel.find().sort({ createdAt: 1});
             // console.log(applications);
@@ -93,11 +94,11 @@ const getApplications=async(req,res)=>{
             // console.error("Error fetching applications:", error);
             res.status(500).json({ error: "Error fetching applications" });
           }
-}
+})
 
-const applicationApproved=async(req,res)=>{
+const applicationApproved=asyncHandler(async(req,res)=>{
     res.status(200).json("Application approved and deleted")
     await applicationmodel.findByIdAndDelete(req.params.id);
-}
+})
 
 module.exports={academicRegistration,getAcademicRegistrations,academicRegApproved, upload,applicationform,getApplications,applicationApproved}

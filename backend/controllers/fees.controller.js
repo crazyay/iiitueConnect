@@ -1,8 +1,10 @@
 const MailOnSuccessfulPayment =require("../middleware/email.middleware.js")
 const Stripe = require("stripe");
+const {asyncHandler}=require('../utils/asyncHandler')
+
 const stripe = new Stripe("sk_test_51ON9vwSIUs4beRKmyBG9eMRRVQn53TT4lWBSOjk1VQe4k9qyCkVY4zsiDDyr0pK6kSR2fT1WqL5CK1umkL7NLDhz00SevryZle");
 
-const feePayment=async(req,res)=>{
+const feePayment=asyncHandler(async(req,res)=>{
     const { amount, email, semester,paymentMethod } = req.body;
   // console.log(req.body);
   try {
@@ -31,9 +33,9 @@ const feePayment=async(req,res)=>{
     // console.error("Error creating checkout session:", error);
     res.status(500).json({ error: "Unable to create checkout session" });
   }
-}
+})
 
-const successPayment=async(req,res)=>{
+const successPayment=asyncHandler(async(req,res)=>{
     const { sessionId } = req.body;
     // console.log("sessioid");
       console.log(sessionId);
@@ -64,6 +66,6 @@ const successPayment=async(req,res)=>{
       // console.error('Error processing payment:', error);
       res.status(500).json({ error: 'Internal server error.' });
     }
-}
+})
 
 module.exports={feePayment,successPayment}

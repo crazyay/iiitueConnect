@@ -22,10 +22,12 @@ function Login() {
             headers: {
                 'content-type': 'application/json'
             },
+            credentials:'include',
+            
         });
       
        let result = await response.json();
-        console.log(result); 
+        console.log(result.accesstoken); 
       
         if (response.ok) {
             student_name = result.email; // Assuming there is a 'name' field in the user object

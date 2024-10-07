@@ -2,6 +2,8 @@
 const mongoose=require('mongoose')
 const bcrypt =require('bcrypt')
 const jwt=require('jsonwebtoken')
+const {asyncHandler}=require('../utils/asyncHandler')
+
 const userSchema=mongoose.Schema({
     rollno:Number,
     email:String,
@@ -20,11 +22,10 @@ userSchema.pre("save",async function(next){
  userSchema.methods.isPasswordCorrect=async function(password){
     return await bcrypt.compare(password,this.password);
  }
- userSchema.methods.generateAccessToken= async function(){
+ userSchema.methods.generateAccessToken=async function(){
  return await jwt.sign({
        _id:this._id,
         email:this.email,
-        
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
@@ -42,7 +43,7 @@ userSchema.pre("save",async function(next){
     }
     )
  }
- 
+
 
 module.exports=mongoose.model('user',userSchema);
     
