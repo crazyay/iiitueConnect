@@ -10,6 +10,9 @@ import Login from './components/Login';
 import Academicform from './components/Academicform';
 // import Ece from './components/Ece';
 // import It from './components/It';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
+
 import ComplaintForm from './components/Complaint';
 import Registrationtype from './components/Registrationtype';
 import HostelReg from './components/HostelReg';
@@ -38,7 +41,13 @@ function App() {
  
   const params =useParams();
   const {name}= params;
-  return (<div classname="overflow-y-hidden">
+  return (
+    <>
+     <div>
+            {/* This container will catch all toast notifications */}
+            <ToastContainer />
+        </div>
+  <div classname="overflow-y-hidden">
 
     <BrowserRouter>
     <Nav />
@@ -67,7 +76,7 @@ function App() {
     </BrowserRouter>
     <Footer/>
       </div>
-    
+      </>
   );
 }
 

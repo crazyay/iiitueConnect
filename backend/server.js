@@ -3,7 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const cookieParser = require('cookie-parser');
-
+const {apiError}=require('./utils/apiError.js')
 
 const cors=require("cors")
 require('./db/config')
@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors({ 
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000','http://localhost:3001'],
     optionsSuccessStatus: 200,
     credentials: true,
 }));
@@ -35,7 +35,21 @@ app.use("/users",userRouter)
 app.use('/hostel',hostelRouter)
 app.use('/academic',academicRouter)
 app.use('/fees',feesRouter)
+app.use((err, req, res, next) => {
+  if (err instanceof apiError) {
+    return res.status(err.statusCode).json({
+      success: err.success,
+      message: err.message,
+      error: err.error,
+    });
+  }
 
+  // If it's not an instance of apiError, return a generic 500 error
+  return res.status(500).json({
+    success: false,
+    message: 'Internal Server Error',
+  });
+});
 app.listen(8000,(req,res)=>{
   console.log("backened server started");
 })

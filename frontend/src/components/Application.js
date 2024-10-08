@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { json } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function ApplicationForm() {
   const initialFormData={
@@ -42,14 +43,17 @@ formdata.forEach((value, key) => {
       });
       
       if (response.ok) {
+        toast.success("Application sent successfully")
         console.log("File uploaded successfully!");
         setFormData(initialFormData);
         // You can handle success here (e.g., show a success message)
       } else {
+         toast.error("Error! try again")
         console.error("Error uploading file"); 
         // Handle the error (e.g., show an error message)
       }
     } catch (error) {
+        toast.error("Error! try again")
       console.error("Error uploading file", error);
       // Handle the error (e.g., show an error message)
     }

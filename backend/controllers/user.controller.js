@@ -13,6 +13,7 @@ const generateAccessAndRefreshToken=async(userId )=>{
    const accessToken=await user.generateAccessToken();
    const refreshToken=await user.generateRefreshToken();
    
+  //  console.log(accessToken);
    
    user.refreshToken=refreshToken;
    await user.save({validateBeforeSave:false})
@@ -42,13 +43,12 @@ const registerUser=asyncHandler(async(req,res)=>{
     throw new apiError(500,"Invalid or undefined email address")
   }
   
-   
+  
   const existedUser=await User.findOne( {email})
    if(existedUser){
-    res.status(409).json({ error: "User already exists with the same username or email" });
 
+    throw new apiError(500,"User is already registered")
    }
-  
   const user= await User.create({
       rollno,
       email,
@@ -72,20 +72,22 @@ const updateUserPassword=asyncHandler(async(req,res)=>{
     throw new apiError(400,"details are must");
   }
   
-  
   const user=await User.findById(req.user?._id)
   if(!user){
     throw new apiError(401,"User not found");
   }
-  const isPasswordCorrect=user.isPasswordCorrect(oldPassword);
+  const isPasswordCorrect=await user.isPasswordCorrect(oldPassword);
   if(!isPasswordCorrect){
     throw new apiError(400,"Password is wrong")
   }
+  console.log(isPasswordCorrect);
+  
   user.password=newPassword;
     await user.save({validateBeforeSave:false});
     return res.status(200)
     .json("password updated")
 })
+
 const loginUser=asyncHandler(async(req,res)=>{
       
 // console.log(req.body);
@@ -108,12 +110,9 @@ const validuser=await user.isPasswordCorrect(password);
 
  return res.status(401).json({ success: false, message: 'Password or email is wrong' });
  }
- 
 const {accessToken,refreshToken} =await generateAccessAndRefreshToken(user._id);
 // console.log(accessToken);
 // console.log(refreshToken);
-
-
 const loggedInUser=await User.findById(user._id).select("-password -refreshToken") 
  //instead of one call to db just simply update the user object with the 
  // new refreshToken which is generated after user call 
@@ -133,6 +132,6 @@ const options={
   .cookie("accessToken",accessToken,options)
   .cookie("refreshToken",refreshToken,options)
   .json(loggedInUser)
-
 })
+
 module.exports = { registerUser,loginUser,updateUserPassword };

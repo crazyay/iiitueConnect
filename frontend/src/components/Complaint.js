@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 
 function ComplaintForm() {
   const initialFormData = {
@@ -38,14 +39,17 @@ function ComplaintForm() {
       });
       
       if (response.ok) {
+        toast.success("Complaint sent")
         console.log("Complaint submitted successfully!");
         setFormData(initialFormData);
       
       } else {
+        toast.error("Oops! Error, Try Again")
         console.error("Error submitting complaint"); 
         
       }
     } catch (error) {
+      toast.error("Oops! Error, Try Again")
       console.error("Error submitting complaint", error);
       // Handle the error (e.g., show an error message)
     }

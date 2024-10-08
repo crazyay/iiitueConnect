@@ -1,44 +1,81 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import React, { useEffect } from "react";
+import React, { useState,useEffect,useRef } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
+import {toast} from "react-toastify"
 import Logo from "./Logo";
 export default function Nav() {
-    // const [loggedin,setloggedin]=React.useState(false);
-    const [rollno,setrollno]=React.useState("");
-    
-    // function log(){
-
-    //     setloggedin(!loggedin);
-    // }
-    const navigate=useNavigate();
-    const logout=()=>{
+    const [clicked, setClicked] = useState(false);
+    const auth = localStorage.getItem('user');
+    const { email } = auth ? JSON.parse(auth) : {email:null };
+    const navigate = useNavigate();
+    const dropdownRef = useRef(null);
+    const logout = () => {
+        toast.success("Logged out successfully")
         localStorage.clear();
-       navigate('/Login');
-    }
-const auth=localStorage.getItem('user');
-const {email}=auth?JSON.parse(auth):{rollNo:null};
+        navigate('/Login');
+    };
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+          if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setClicked(false);
+          }
+        };
+        if (clicked) {
+            document.addEventListener('mousedown', handleClickOutside);
+          } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+          }
+      
+          return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+          };
+        }, [clicked]);
 
-useEffect(()=>{
- setrollno(email);
-},[rollno]);
     return (
-           <div className="sticky top-0">
-                <ul className="flex justify-between dark:bg-gray-900 pl-4 items-center p-2 text-white">
-                    <div className="flex items-center ">
+        <div className="sticky top-0">
+            <ul className="flex justify-between bg-blue-500 pl-4 items-center p-2 text-white">
+            <div className="flex items-center">
                     <li className="text-xl mr-2 font-bold font-serif"><NavLink to={"/"}><Logo /></NavLink></li>
                     <li className="text-xl font-bold font-serif" ><NavLink to={"/"}>IIIT Una</NavLink></li>
                     </div>
-                  
-                    
-                    <li className=" relative  mr-0 font-bold font-serif">  
-                    {auth?(  <>
-     <span className="text-white px-4">{rollno}</span>
-    <NavLink onClick={logout} to="/Login">
-      <span className="text-white px-4"> Logout </span>
-    </NavLink>
-  </> )
-                    :(<NavLink  to={"/Login"}><span className=""> Login </span></NavLink>)} 
-                     </li>
-                    </ul>
+                <li className="relative mr-0 font-bold font-serif">
+                    {auth ? (
+                        <>
+                            <button
+                                onClick={() => setClicked(!clicked)}
+                                className="h-9 w-9 bg-black rounded-full"
+                                aria-label="Toggle User Menu"
+                            >
+                            <FontAwesomeIcon icon={faUser} />
+                                {/* Optional: Add an icon or text here */}
+                            </button>
+
+                            {/* Dropdown menu */}
+                            <div  ref={dropdownRef} className={`${!clicked ? 'hidden' : 'flex'} bg-slate-600 flex-col pb-2 absolute right-0 top-full mt-1  shadow-lg text-white`}>
+                               
+                                <div className=" hover:bg-blue-500 pt-2 font-semibold text-xl">
+                                    <span className=" px-4">{email}</span>
+                                </div>
+                                <div className=" hover:bg-blue-500 pt-2  font-semibold text-xl">
+                                    <NavLink to="/changepassword">
+                                        <span className=" px-4">Changepassword</span>
+                                    </NavLink>
+                                </div>
+                                <div className=" hover:bg-blue-500 pt-2 font-semibold  text-xl">
+                                    <NavLink onClick={logout} to="/Login">
+                                        <span className="px-4">Logout</span>
+                                    </NavLink>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <NavLink to="/Login">
+                            <span className="text-green-950 px-4">Login</span>
+                        </NavLink>
+                    )}
+                </li>
+            </ul>
         </div>
-    )
+    );
 }

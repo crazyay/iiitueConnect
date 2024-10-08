@@ -2,6 +2,8 @@
 import './App.css';
 import Header from './components/Header';
 import { Routes,Route, BrowserRouter } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
 import Nav from './components/Nav';
 import apple from './components/Apple-Logo.png'
 import netflix from './components/netflix.jpg'
@@ -17,6 +19,7 @@ import AcademicRegistration from './components/AcademicRegistration';
 import HostelReg from './components/HostelReg';
 import Login from './components/Login';
 import Private from './components/Private'
+import ChangePassword from './components/ChangePassword';
 function App() {
   const placements = [
     { name: 'Student A', company: 'Company A', package: '$100,000', logo:apple },
@@ -28,6 +31,10 @@ function App() {
     // Add more placement data as needed
   ];
   return (
+    <>
+     <div>
+            <ToastContainer />  {/* This component is needed to display the toast */}
+        </div>
     <div>
   <BrowserRouter>
   <Nav />
@@ -42,12 +49,14 @@ function App() {
    <Route path='/Complaint/:page' element={<Complaint   />} />
    <Route path="/Registration/Academic" element={<AcademicRegistration/>}/> 
    <Route path="/Registration/Hostel" element={<HostelReg/>}/> 
+   <Route path="/changepassword" element={<ChangePassword/>}/>
    </Route>
    <Route path='Login' element= {<Login/>} />
   </Routes>
   <Footer />
     </BrowserRouter>
     </div>
+    </>
   );
 }
 

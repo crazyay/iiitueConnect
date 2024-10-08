@@ -1,6 +1,10 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import React, { useState,useEffect,useRef } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
+
 import Logo from "./Logo";
+import { toast } from "react-toastify";
 export default function Nav() {
     const [clicked, setClicked] = useState(false);
     const auth = localStorage.getItem('user');
@@ -9,6 +13,9 @@ export default function Nav() {
     const dropdownRef = useRef(null);
     const logout = () => {
         localStorage.clear();
+        document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        toast.success("Logged Out successfully")
         navigate('/Login');
     };
     useEffect(() => {
@@ -40,9 +47,10 @@ export default function Nav() {
                         <>
                             <button
                                 onClick={() => setClicked(!clicked)}
-                                className="h-9 w-9 rounded-full bg-red-500"
+                                className="h-9 w-9 bg-black rounded-full"
                                 aria-label="Toggle User Menu"
                             >
+                            <FontAwesomeIcon icon={faUser} />
                                 {/* Optional: Add an icon or text here */}
                             </button>
 

@@ -28,33 +28,7 @@ export default function Application() {
 
  
 
-  // const handleApprove = async (id) => {
-  //   try {
-  //     const response = await fetch(`http://localhost:8000/approve-application/${id}`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ comment: comments[id] }),
-  //     });
-  //     if (!response.ok) {
-  //       throw new Error("Failed to approve application");
-  //     }
-      
-  //     // Update the comments state to clear the comment associated with the approved application
-  //     setComments({ ...comments, [id]: "" });
-      
-      
-  //     // Update the applications state to trigger a re-render
-  //     setApplications(applications.map((app) =>
-  //       app._id === id ? { ...app, approved: true } : app
-  //     ));
-  //     fetchData();
-  //   } catch (error) {
-  //     console.error("Error approving application:", error);
-  //   }
-  // };
-
+  
 
   const handleApprove = async (id) => {
     try {

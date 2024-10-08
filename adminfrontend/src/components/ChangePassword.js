@@ -1,43 +1,38 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-function Login() {
-    let [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+import {toast} from "react-toastify"
+function ChangePassword() {
+    // let [email, setEmail] = useState("");
+    const [oldPassword, setoldPassword] = useState("");
+    const [newPassword, setnewPassword] = useState("");
     const navigate = useNavigate();
-    let student_name = "";
-    let student_roll_no = "";
-    
-    useEffect(() => {
-        const auth = localStorage.getItem('user');
-        if (auth) {
-            navigate('/');
-        }
-    });
+   
 
     const collectData = async () => {
-        let response = await fetch('http://localhost:8000/users/Login', {
+     
+        
+        let response = await fetch('http://localhost:8000/staff/changepassword', {
             method: 'post',
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ oldPassword, newPassword }),
             headers: {
                 'content-type': 'application/json'
             },
             credentials:'include',
-            
         });
       
        let result = await response.json();
-        console.log(result); 
+        console.log(result);
+        
       
         if (response.ok) {
-            student_name = result.email; // Assuming there is a 'name' field in the user object
-            student_roll_no = result.rollNo; // Assuming there is a 'roll_no' field in the user object
-            localStorage.setItem("user", JSON.stringify(result));
-            toast.success("Login Successfully")
+            toast.success("Password Updated")
+            // student_name = result.email; // Assuming there is a 'name' field in the user object
+            // student_roll_no = result.rollNo; // Assuming there is a 'roll_no' field in the user object
+            // localStorage.setItem("user", JSON.stringify(result));
             navigate('/');
         } else {
-             toast.error("Please enter correct details"); 
-            // alert("Please enter correct details");
+            toast.error("Please enter correct details")
+           
         }
     };
 
@@ -58,18 +53,18 @@ function Login() {
                     <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                         <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                                Sign in to your account
+                               Change your Password
                             </h1>
                             <div className="space-y-4 md:space-y-6">
                                 <div>
-                                    <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                                    <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="roll_number@iiitu.ac.in" required="" />
+                                    <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"> oldPassword</label>
+                                    <input value={oldPassword} onChange={(e) => setoldPassword(e.target.value)} placeholder="old Password" type="password" name="oldPassword" id="oldPassword" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"  required="" />
                                 </div>
                                 <div>
                                     <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                                    <input value={password} onChange={(e) => setPassword(e.target.value)} onKeyPress={handleKeyPress} type="password" name="password" id="password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="" />
+                                    <input value={newPassword} onChange={(e) => setnewPassword(e.target.value)} onKeyPress={handleKeyPress} type="password" name="newPassword" id="password" placeholder="new Password" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="" />
                                 </div>
-                                <div className="flex items-center justify-between">
+                                {/* <div className="flex items-center justify-between">
                                     <div className="flex items-start">
                                         <div className="flex items-center h-5">
                                             <input id="remember" aria-describedby="remember" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="" />
@@ -79,9 +74,9 @@ function Login() {
                                         </div>
                                     </div>
                                     <a href="/" className="text-sm font-medium text-blue-500 hover:underline dark:text-primary-500">Forgot password?</a>
-                                </div>
+                                </div> */}
 
-                                <button onClick={collectData} className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Login</button>
+                                <button onClick={collectData} className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Change Password</button>
                             </div>
                         </div>
                     </div>
@@ -91,4 +86,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default ChangePassword;

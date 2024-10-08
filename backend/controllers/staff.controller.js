@@ -1,7 +1,7 @@
 const Staff=require('../models/staffmodel.js');
 const {apiError}=require('../utils/apiError')
+const {apiResponse}=require('../utils/apiResponse.js')
 const {asyncHandler}=require('../utils/asyncHandler')
-
 const generateAccessAndRefreshToken=async(userId )=>{
     try {
       const user=await Staff.findById(userId);
@@ -12,6 +12,7 @@ const generateAccessAndRefreshToken=async(userId )=>{
    const refreshToken=await user.generateRefreshToken();
    user.refreshToken=refreshToken;
    await user.save({validateBeforeSave:false})
+  // console.log(accessToken);
   
    return {accessToken, refreshToken}
   
@@ -24,14 +25,19 @@ const generateAccessAndRefreshToken=async(userId )=>{
   }
   const updateUserPassword=asyncHandler(async(req,res)=>{
     const {oldPassword,newPassword}=req.body;
+
+    
     if(!oldPassword||!newPassword){
       throw new apiError(400,"details are must");
     }
-    const user=await User.findById(req.user?._id)
+    const user=await Staff.findById(req.user?._id)
+    // console.log(user);
     if(!user){
       throw new apiError(401,"User not found");
     }
-    const isPasswordCorrect=user.isPasswordCorrect(oldPassword);
+    const isPasswordCorrect= await user.isPasswordCorrect(oldPassword);
+    // console.log(isPasswordCorrect);
+    
     if(!isPasswordCorrect){
       throw new apiError(400,"Password is wrong")
     }
@@ -40,10 +46,11 @@ const generateAccessAndRefreshToken=async(userId )=>{
       return res.status(200)
       .json(new apiResponse(200,{},"password updated"))
   })
+
 const registerUser=asyncHandler(async(req,res)=>{
     const {email, password}=req.body;
     if([email,password].some((field)=>field?.trim()==="")){
-       return new apiError(400,"All fields are required")
+       throw new apiError(400,"All fields are required")
     }
     const emailDomain = email.split('@')[1];
     if (emailDomain !== 'iiitu.ac.in') {
@@ -106,7 +113,8 @@ const loggedInUser=await Staff.findById(user._id).select("-password -refreshToke
 const options={       
                     // by using this options we can allows tokens to be
   httpOnly:true,  // only modifiable from server not from client side
-  secure:true
+  secure:true,
+  sameSite: 'Lax',
 } 
  return res.status(200)
  .cookie("accessToken",accessToken,options)

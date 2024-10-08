@@ -1,4 +1,5 @@
 import react,{ useState,useEffect } from "react";
+import { toast } from "react-toastify";
 export default function Branch(){
 
 const initialFormData={rollno:"",email:"",name:"",phone:"",semester:"",branch:"",batch:"",feeamount:"",receiptno:"",file:null}
@@ -26,14 +27,17 @@ const initialFormData={rollno:"",email:"",name:"",phone:"",semester:"",branch:""
           body: formData,
         });
         if (response.ok) {
+          toast.success("Form submitted successfully")
           console.log("File uploaded successfully!");
           setdata(initialFormData);
           // You can handle success here (e.g., show a success message)
         } else {
+          toast.error("Error uploading file")
           console.error("Error uploading file"); 
           // Handle the error (e.g., show an error message)
         }
       } catch (error) {
+        toast.error("Error uploading file")
         console.error("Error uploading file", error);
         // Handle the error (e.g., show an error message)
       }

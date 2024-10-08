@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import {toast} from "react-toastify"
 function Login() {
     let [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -22,18 +22,21 @@ function Login() {
             headers: {
                 'content-type': 'application/json'
             },
+            credentials:'include'
         });
       
        let result = await response.json();
         console.log(result);
       
         if (response.ok) {
+            toast.success("Logged In successfully");
             student_name = result.email; // Assuming there is a 'name' field in the user object
             student_roll_no = result.rollNo; // Assuming there is a 'roll_no' field in the user object
             localStorage.setItem("user", JSON.stringify(result));
             navigate('/');
         } else {
-            alert("Please enter correct details");
+            toast.error("Please enter correct details")
+           
         }
     };
 

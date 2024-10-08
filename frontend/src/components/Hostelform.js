@@ -1,4 +1,5 @@
 import { useState,useEffect } from "react";
+import { toast } from "react-toastify";
 export default function Hostelform(){
   const initialFormData = {
     rollno: "",
@@ -37,14 +38,18 @@ export default function Hostelform(){
         
   
         if (response.ok) {
+          toast.success("Form submitted")
           console.log("File uploaded successfully!");
           setdata(initialFormData);
           // You can handle success here (e.g., show a success message)
         } else {
+          toast.error("Oops! Something went wrong! Try Again")
           console.error("Error uploading file");
           // Handle the error (e.g., show an error message)
         }
       } catch (error) {
+        toast.error("Oops! Something went wrong! Try Again")
+
         console.error("Error uploading file", error);
         // Handle the error (e.g., show an error message)
       }
