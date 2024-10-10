@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {toast} from "react-toastify"
 
 export default function Complaint(){
   const {page}=useParams();
@@ -18,7 +19,8 @@ export default function Complaint(){
         console.error("Error fetching data:", error);
       }
     };
-    const handleApprove=async(id)=>{
+    const handleApprove=async(e,id)=>{
+      e.preventDefault();
       try {
 
         const response = await fetch(`http://localhost:8000/hostel/resolve-complaint/${id}`,{
@@ -29,7 +31,11 @@ export default function Complaint(){
           body: JSON.stringify({ comment: comments[id] }),
         });
         // console.log("hua");
-        if (!response.ok) {
+        if (response.ok) {
+          toast.success("Complaint checked");
+        }else{
+          
+          toast.error("Complaint verification failed")
           throw new Error("Failed to approve application");
         }
         // setApplications(applications.map((app) =>
@@ -42,6 +48,7 @@ export default function Complaint(){
         fetchData();
     
       } catch (error) {
+        toast.error("Complaint verification failed")
         console.error("Error approving application:", error);
       }
     }
@@ -88,9 +95,9 @@ export default function Complaint(){
                 <button
                   type="submit"
                   className="bg-primary-600 border-4 bg-slate-600  text-white px-4 py-2 rounded-lg"
-                  onClick={() => handleApprove(item._id)}
+                  onClick={(e) => handleApprove(e,item._id)}
                 >
-                   <span className="text-2xl font-bold "> Resolved</span> 
+                   <span className="text-2xl font-bold ">Approve</span> 
                 </button>
               </>
             )}

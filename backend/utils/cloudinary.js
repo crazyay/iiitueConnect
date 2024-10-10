@@ -1,9 +1,10 @@
-import dotenv from "dotenv";
-dotenv.config({path:"../.env"});
+const dotenv = require('dotenv');
+dotenv.config({ path: '../.env' });
 
-import {v2 as cloudinary} from "cloudinary"
+const cloudinary = require('cloudinary').v2;
 
-import fs from "fs";
+const fs = require('fs');
+
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_DB_NAME,
     api_key: process.env.CLOUDINARY_API_KEY, // Ensure this is correctly set
@@ -20,7 +21,14 @@ const uploadOnCloudinary=async (localFilePath)=>{
        const response=await cloudinary.uploader.upload(localFilePath,{
         resource_type:"auto"  //automatically detects data type like videos pdf photos etc
        })
-       console.log("file uploaded on cloudinary",response.url);
+    //    console.log("file uploaded on cloudinary",response.secure_url);
+       fs.unlink(localFilePath, (err) => {
+        if (err){
+            console.error("Error deleting file:", err);
+        }else{
+            console.log("File deleted successfully");
+        }
+    });
        return response;
     } catch (error){
         fs.unlink(localFilePath, (err) => {
@@ -30,6 +38,9 @@ const uploadOnCloudinary=async (localFilePath)=>{
                 console.log("File deleted successfully");
             }
         });
+        // fs.unlink(filePath, (err) => {
+        //     if (err) console.error('Error removing file', err);
+        // });
         // console.log(error);
         return null;
         

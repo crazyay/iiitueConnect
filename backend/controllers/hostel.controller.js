@@ -1,18 +1,19 @@
 const hostelmodel=require('../models/hostelmodel')
 const complaintmodel=require('../models/complaintsmodel')
 const {asyncHandler}=require('../utils/asyncHandler')
-
+const {uploadOnCloudinary}=require('../utils/cloudinary')
 const multer = require('multer')
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'hostelreceipt/'); // Specify the directory where files will be stored
-    },
-    filename: function (req, file, cb) {
+const { apiError } = require('../utils/apiError')
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//       cb(null, 'hostelreceipt/'); // Specify the directory where files will be stored
+//     },
+//     filename: function (req, file, cb) {
      
-      cb(null,file.originalname);
-    }
-  });
-const upload = multer({ storage: storage });
+//       cb(null,file.originalname);
+//     }
+//   });
+// const upload = multer({ storage: storage });
 
 const hostelRegistration=asyncHandler(async(req,res)=>{
     try {
@@ -20,9 +21,18 @@ const hostelRegistration=asyncHandler(async(req,res)=>{
         // console.log("Form Data:", req.body);
         // console.log("File Data:", req.file);
         // Create a new hostelmodel instance with form data and file information
+        if(!req.file){
+          throw new apiError(404,"Reciept is missing");
+        }
+
+       
+        const fileurl=await uploadOnCloudinary(req.file.path);
+        if(!fileurl){
+          throw new apiError(500,"Reciept uploadation failed! Try Again")
+        }
         const data = new hostelmodel({
             ...req.body, // Include form fields
-            feepdf: req.file.filename // Include the generated filename for the file
+            feepdf: fileurl.secure_url // Include the generated filename for the file
         });
     
         // Save the data to the database
@@ -72,4 +82,4 @@ const complaintResolved=asyncHandler(async(req,res)=>{
 }
 )
 
-module.exports={hostelRegistration, upload,complaints,getComplaints,getHostelRegistration,hostelRegistrationApproved,complaintResolved}
+module.exports={hostelRegistration,complaints,getComplaints,getHostelRegistration,hostelRegistrationApproved,complaintResolved}

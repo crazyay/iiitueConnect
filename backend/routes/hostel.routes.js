@@ -1,8 +1,9 @@
 const express=require('express');
-const { hostelRegistration, upload, complaints, getComplaints, getHostelRegistration, hostelRegistrationApproved, complaintResolved } = require('../controllers/hostel.controller');
+const { hostelRegistration, complaints, getComplaints, getHostelRegistration, hostelRegistrationApproved, complaintResolved } = require('../controllers/hostel.controller');
 const sendEmailMiddleware = require('../middleware/mail.middleware');
 const hostelmodel = require('../models/hostelmodel');
 const complaintsmodel = require('../models/complaintsmodel');
+const {upload}=require('../middleware/fileupload.middleware')
 
 const router=express.Router()
 

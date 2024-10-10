@@ -2,7 +2,8 @@ const academicmodel=require('../models/academicmodel')
 const applicationmodel=require('../models/applicationmodel')
 const multer=require('multer')
 const {asyncHandler}=require('../utils/asyncHandler')
-
+const {uploadOnCloudinary}=require('../utils/cloudinary')
+const { apiError } = require('../utils/apiError')
 const storage1 = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, 'academicreceipt/'); // Specify the directory where files will be stored`
@@ -18,15 +19,21 @@ const storage1 = multer.diskStorage({
 const academicRegistration=async(req,res)=>{
     try {
         // Log form data and file data
-        // console.log("Form Data:", req.body);
-        // console.log("File Data:", req.file);
-    
+        console.log("Form Data:", req.body?req.body:null);
+        console.log("File Data:", req.file);
+        if(!req.file){
+          throw new apiError(404,"Reciept is missing");
+        }
         // Create a new hostelmodel instance with form data and file information
+          const fileurl=await uploadOnCloudinary(req.file.path);
+          if(!fileurl){
+            throw new apiError(500,"Reciept uploadation failed! Try Again")
+          }
         const data = new academicmodel({
             ...req.body, // Include form fields 
-            feepdf: req.file.filename // Include the generated filename for the file
+            feepdf: fileurl.secure_url // Include the generated filename for the file
         });
-    
+        
         // Save the data to the database
         const savedData = await data.save();
     
@@ -34,8 +41,10 @@ const academicRegistration=async(req,res)=>{
         res.status(200).send("File uploaded successfully!");
     } catch (error) {
         // Handle errors
-        // console.error("Error uploading file:", error);
-        res.status(500).send("Error uploading file: " + error.message);
+        console.log(req.body);
+        
+        console.error("Error uploading file:", error);
+       return res.status(500).send("Error uploading file: " + error.message);
     }
 }
 const getAcademicRegistrations=asyncHandler( async(req,res)=>{
@@ -101,4 +110,4 @@ const applicationApproved=asyncHandler(async(req,res)=>{
     await applicationmodel.findByIdAndDelete(req.params.id);
 })
 
-module.exports={academicRegistration,getAcademicRegistrations,academicRegApproved, upload,applicationform,getApplications,applicationApproved}
+module.exports={academicRegistration,upload,getAcademicRegistrations,academicRegApproved,applicationform,getApplications,applicationApproved}

@@ -39,9 +39,10 @@ function ComplaintForm() {
       });
       
       if (response.ok) {
-        toast.success("Complaint sent")
+     
         console.log("Complaint submitted successfully!");
         setFormData(initialFormData);
+        toast.success("Complaint sent")
       
       } else {
         toast.error("Oops! Error, Try Again")

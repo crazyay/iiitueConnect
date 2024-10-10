@@ -1,4 +1,6 @@
 import { useEffect, useState,useRef } from "react";
+import {toast } from "react-toastify";
+
 export default function Application() {
   const [applications, setApplications] = useState([]);
   const [comments, setComments] = useState({});
@@ -30,7 +32,8 @@ export default function Application() {
 
   
 
-  const handleApprove = async (id) => {
+  const handleApprove = async (e,id) => {
+    e.preventDefault();
     try {
 
       const response = await fetch(`http://localhost:8000/academic/approve-application/${id}`, {
@@ -41,7 +44,11 @@ export default function Application() {
         body: JSON.stringify({ comment: comments[id] }),
       });
       // console.log("hua");
-      if (!response.ok) {
+      if (response.ok) {
+        toast.success("Application verified")
+        
+      }else{
+        toast.error("Verification failed!")
         throw new Error("Failed to approve application");
       }
       // setApplications(applications.map((app) =>
@@ -96,7 +103,7 @@ export default function Application() {
                 <button
                   type="submit"
                   className="bg-primary-600 border-4 bg-slate-600 text-white px-4 py-2 rounded-lg"
-                  onClick={() => handleApprove(app._id)}
+                  onClick={(e) => handleApprove(e,app._id)}
                 >
                 <span className="text-xl font-bold">  Approve </span> 
                 </button>

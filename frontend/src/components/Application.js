@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { json } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 
 function ApplicationForm() {
   const initialFormData={
@@ -43,9 +43,10 @@ formdata.forEach((value, key) => {
       });
       
       if (response.ok) {
-        toast.success("Application sent successfully")
         console.log("File uploaded successfully!");
         setFormData(initialFormData);
+
+        toast.success("Application sent successfully")
         // You can handle success here (e.g., show a success message)
       } else {
          toast.error("Error! try again")
@@ -87,6 +88,9 @@ formdata.forEach((value, key) => {
         <textarea id="message" name="message" rows="4" value={formData.message} onChange={handleChange} className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your message..."></textarea>
       </div>
       <button type="submit" className="self-center w-40 py-2.5 px-4 text-sm text-white font-medium bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Submit Application</button>
+      <div>
+ <ToastContainer />
+  </div> 
     </form>
   );
 }

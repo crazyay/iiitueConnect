@@ -1,5 +1,7 @@
 import react,{ useState,useEffect } from "react";
 import { toast } from "react-toastify";
+import { ToastContainer } from 'react-toastify';
+
 export default function Branch(){
 
 const initialFormData={rollno:"",email:"",name:"",phone:"",semester:"",branch:"",batch:"",feeamount:"",receiptno:"",file:null}
@@ -7,7 +9,7 @@ const initialFormData={rollno:"",email:"",name:"",phone:"",semester:"",branch:""
     const [data,setdata] =useState(initialFormData);
     const handleSubmit =async (event) => {
       // console.warn(data);
-      // event.preventDefault();
+      event.preventDefault();
       // Add logic to handle form submission here
       try {
         const formData = new FormData();
@@ -26,10 +28,12 @@ const initialFormData={rollno:"",email:"",name:"",phone:"",semester:"",branch:""
           method: "POST",
           body: formData,
         });
+        console.log(response);
+        
         if (response.ok) {
-          toast.success("Form submitted successfully")
           console.log("File uploaded successfully!");
           setdata(initialFormData);
+          toast.success("Form submitted successfully")
           // You can handle success here (e.g., show a success message)
         } else {
           toast.error("Error uploading file")
@@ -42,12 +46,8 @@ const initialFormData={rollno:"",email:"",name:"",phone:"",semester:"",branch:""
         // Handle the error (e.g., show an error message)
       }
   };
-  
-   
-
     function updatedata(event){
       const {name,value,type}=event.target;
-
       setdata((prevData) => 
       {
         return{
@@ -68,7 +68,9 @@ const initialFormData={rollno:"",email:"",name:"",phone:"",semester:"",branch:""
     // Function to toggle dropdown visibility
  
     return(
+
         <form className=" max-w-2xl mx-auto pt-20 pb-20" encType="multipart/form-data" onSubmit={handleSubmit}>
+       
         <div className="relative z-0 w-full mb-5 group">
             <input type="text" value={data.rollno} onChange={updatedata} name="rollno" id="floating_password" className="block py-2.5 px-0 w-full text-sm dark:text-black text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none  dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
             <label for="floating_password" className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Roll no</label>
@@ -137,6 +139,10 @@ const initialFormData={rollno:"",email:"",name:"",phone:"",semester:"",branch:""
 </div>   
  
 <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"  >Submit</button>
+<div>
+
+<ToastContainer />
+</div> 
 </form>
 );
 }

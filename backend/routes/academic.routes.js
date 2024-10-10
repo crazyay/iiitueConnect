@@ -1,8 +1,9 @@
 const express=require('express');
-const {academicRegistration,upload, applicationform, getApplications, getAcademicRegistrations, academicRegApproved, applicationApproved}=require('../controllers/academic.controller');
+const {academicRegistration, applicationform, getApplications, getAcademicRegistrations, academicRegApproved, applicationApproved}=require('../controllers/academic.controller');
 const sendEmailMiddleware = require('../middleware/mail.middleware');
 const academicmodel = require('../models/academicmodel');
 const applicationmodel = require('../models/applicationmodel');
+const {upload}=require('../middleware/fileupload.middleware')
 const router=express.Router()
 
 router.route("/academicform").post(upload.single('file'),academicRegistration);

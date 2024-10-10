@@ -15,7 +15,8 @@ export default function Hostelform(){
     const [data,setdata] =useState(initialFormData);
     
    
-    const  handleSubmit = async (event) => {
+    const  handleSubmit = async (e) => {
+         e.preventDefault();
      
       try {
         const formData = new FormData();
@@ -32,15 +33,13 @@ export default function Hostelform(){
         const response = await fetch("http://localhost:8000/hostel/hostelform", {
           method: "POST",
           body: formData,
-
-
         });
+        console.log(response);
         
-  
         if (response.ok) {
-          toast.success("Form submitted")
           console.log("File uploaded successfully!");
           setdata(initialFormData);
+          toast.success("Form submitted")
           // You can handle success here (e.g., show a success message)
         } else {
           toast.error("Oops! Something went wrong! Try Again")
@@ -58,6 +57,7 @@ export default function Hostelform(){
    
 
     function updatedata(event){
+      // event.preventDefault();
       const {name,value,type}=event.target;
 
       setdata((prevData) => 
@@ -119,7 +119,7 @@ export default function Hostelform(){
 <div className="mt-1 text-sm text-black" id="user_avatar_help">Upload your fee receipt</div>
 </div>   
 </div>   
-<button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" >Submit</button>
+<button  type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" >Submit</button>
 </form>
 );
 }
