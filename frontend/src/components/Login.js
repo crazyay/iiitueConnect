@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 function Login() {
+    console.log(apiUrl);
+    
     let [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
