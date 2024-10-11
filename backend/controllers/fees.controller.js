@@ -2,13 +2,15 @@ const MailOnSuccessfulPayment =require("../middleware/email.middleware.js")
 const Stripe = require("stripe");
 const {asyncHandler}=require('../utils/asyncHandler')
 
-const stripe = new Stripe("sk_test_51ON9vwSIUs4beRKmyBG9eMRRVQn53TT4lWBSOjk1VQe4k9qyCkVY4zsiDDyr0pK6kSR2fT1WqL5CK1umkL7NLDhz00SevryZle");
+const stripe = new Stripe(process.env.STRIPE_KEY);
 
 const feePayment=asyncHandler(async(req,res)=>{
-    const { amount, email, semester,paymentMethod } = req.body;
+    const { name,amount, email, semester,paymentMethod } = req.body;
   // console.log(req.body);
   try {
     const session = await stripe.checkout.sessions.create({
+      
+      
       payment_method_types: ['card'],
       line_items: [
          {
@@ -23,15 +25,22 @@ const feePayment=asyncHandler(async(req,res)=>{
         },
       ],
       mode: 'payment',
-      success_url: 'http://localhost:3001/success', // Redirect URL after successful payment
-      cancel_url: 'http://localhost:3001/cancel', // Redirect URL if user cancels payment
+      success_url: 'https://iiitue-connect-student-frontend.vercel.app/success', // Redirect URL after successful payment
+      cancel_url: 'https://iiitue-connect-student-frontend.vercel.app/cancel', // Redirect URL if user cancels payment
       customer_email: email,
+      metadata: {
+        customer_name: name, // Add customer name here
+      },
+      shipping_address_collection: {
+        allowed_countries: ['IN'], // Specify country, if you are accepting payments from specific countries
+      },
     });
-    res.json({ id: session.id });
     // console.log(session);
+   return res.json({ id: session.id });
+
   } catch (error) {
     // console.error("Error creating checkout session:", error);
-    res.status(500).json({ error: "Unable to create checkout session" });
+   return res.status(500).json({ error: "Unable to create checkout session" });
   }
 })
 

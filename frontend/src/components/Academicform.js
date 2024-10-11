@@ -1,7 +1,7 @@
 import react,{ useState,useEffect } from "react";
 import { toast } from "react-toastify";
 import { ToastContainer } from 'react-toastify';
-
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
 export default function Branch(){
 
 const initialFormData={rollno:"",email:"",name:"",phone:"",semester:"",branch:"",batch:"",feeamount:"",receiptno:"",file:null}
@@ -24,11 +24,11 @@ const initialFormData={rollno:"",email:"",name:"",phone:"",semester:"",branch:""
         formData.append("receiptno", data.receiptno);
         formData.append("file", data.file);
         
-        const response = await fetch("http://localhost:8000/academic/academicform", { 
+        const response = await fetch(`${apiUrl}/academic/academicform`, { 
           method: "POST",
           body: formData,
         });
-        console.log(response);
+        // console.log(response);
         
         if (response.ok) {
           console.log("File uploaded successfully!");

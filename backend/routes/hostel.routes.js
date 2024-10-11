@@ -13,7 +13,4 @@ router.route("/hostelregistrationapproval/:id").put(sendEmailMiddleware(hostelmo
 router.route("/complaint").post(complaints)
 router.route("/Complaint/:page").get(getComplaints)
 router.route("/resolve-complaint/:id").put(sendEmailMiddleware(complaintsmodel),complaintResolved)
-
-
-
 module.exports=router

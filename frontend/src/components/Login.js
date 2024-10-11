@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
 function Login() {
     let [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -16,7 +18,7 @@ function Login() {
     });
 
     const collectData = async () => {
-        let response = await fetch('http://localhost:8000/users/Login', {
+        let response = await fetch(`${apiUrl}/users/Login`, {
             method: 'post',
             body: JSON.stringify({ email, password }),
             headers: {
@@ -74,11 +76,11 @@ function Login() {
                                         <div className="flex items-center h-5">
                                             <input id="remember" aria-describedby="remember" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="" />
                                         </div>
-                                        <div className="ml-3 text-sm">
+                                        {/* <div className="ml-3 text-sm">
                                             <label htmlFor="remember" className="text-gray-500 dark:text-gray-300">Remember me</label>
-                                        </div>
+                                        </div> */}
                                     </div>
-                                    <a href="/" className="text-sm font-medium text-blue-500 hover:underline dark:text-primary-500">Forgot password?</a>
+                                    {/* <a href="/" className="text-sm font-medium text-blue-500 hover:underline dark:text-primary-500">Forgot password?</a> */}
                                 </div>
 
                                 <button onClick={collectData} className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Login</button>

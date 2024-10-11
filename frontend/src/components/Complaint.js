@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 function ComplaintForm() {
   const initialFormData = {
@@ -18,7 +19,7 @@ function ComplaintForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    // console.log(formData);
     // Handle form submission here
     try {
       // const formdata = new FormData();
@@ -30,7 +31,7 @@ function ComplaintForm() {
       // formdata.forEach((value, key) => {
       //   formDataJSON[key] = value;
       // });
-      const response = await fetch("http://localhost:8000/hostel/complaint", {
+      const response = await fetch(`${apiUrl}/hostel/complaint`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json" // Specify that the content type is JSON
@@ -40,13 +41,13 @@ function ComplaintForm() {
       
       if (response.ok) {
      
-        console.log("Complaint submitted successfully!");
+        // console.log("Complaint submitted successfully!");
         setFormData(initialFormData);
         toast.success("Complaint sent")
       
       } else {
         toast.error("Oops! Error, Try Again")
-        console.error("Error submitting complaint"); 
+        // console.error("Error submitting complaint"); 
         
       }
     } catch (error) {

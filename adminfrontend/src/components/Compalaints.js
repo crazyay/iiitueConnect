@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {toast} from "react-toastify"
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 export default function Complaint(){
   const {page}=useParams();
@@ -8,7 +9,7 @@ export default function Complaint(){
    const [comments,setComments]=useState([]);  
     const fetchData = async () => {
       try {  
-        const response = await fetch(`http://localhost:8000/hostel/Complaint/${page}`);
+        const response = await fetch(`${apiUrl}/hostel/Complaint/${page}`);
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -23,7 +24,7 @@ export default function Complaint(){
       e.preventDefault();
       try {
 
-        const response = await fetch(`http://localhost:8000/hostel/resolve-complaint/${id}`,{
+        const response = await fetch(`${apiUrl}/hostel/resolve-complaint/${id}`,{
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

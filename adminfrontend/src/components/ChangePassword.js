@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {toast} from "react-toastify"
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
 function ChangePassword() {
     // let [email, setEmail] = useState("");
     const [oldPassword, setoldPassword] = useState("");
@@ -10,7 +12,7 @@ function ChangePassword() {
 
     const collectData = async (e) => {
      e.preventDefault();
-        let response = await fetch('http://localhost:8000/staff/changepassword', {
+        let response = await fetch(`${apiUrl}/staff/changepassword`, {
             method: 'post',
             body: JSON.stringify({ oldPassword, newPassword }),
             headers: {

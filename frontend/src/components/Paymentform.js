@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 // import axios from 'axios';
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 const PaymentForm = () => {
   const stripe = useStripe();
@@ -11,6 +12,9 @@ const PaymentForm = () => {
     semester:'',
     name:'',
     fathersName:'',
+    address: '', // Add address field
+    city: '',    // Add city field
+    country: '', 
     amount:'',
     paymentMethod: 'card', // Default payment method
   };
@@ -40,7 +44,7 @@ const PaymentForm = () => {
     // }
     
     try {
-      const response = await fetch("http://localhost:8000/fees/payment",{
+      const response = await fetch(`${apiUrl}/fees/payment`,{
         method: "POST",
         headers: {
           "Content-Type": "application/json" // Specify that the content type is JSON
@@ -58,7 +62,7 @@ const PaymentForm = () => {
         sessionId:session.id
       })
       
-      const res = await fetch("http://localhost:8000/fees/success",{
+      const res = await fetch(`${apiUrl}/fees/success`,{
         method: "POST",
         headers: {
           "Content-Type": "application/json" // Specify that the content type is JSON
@@ -68,7 +72,6 @@ const PaymentForm = () => {
         console.log(res);
         console.log(result);   
       
-
 
       // window.location.href = `https://checkout.stripe.com/pay/${sessionId}`;
       // Here you can handle the response from the server
@@ -109,6 +112,28 @@ const PaymentForm = () => {
         value={formData.fathersName}
         onChange={handleChange}
         placeholder="Father's Name"
+        className="block w-full p-2 mb-4 border border-gray-300 rounded-md"
+      />
+        <input
+        type="text"
+        name="address"
+        value={formData.address}
+        onChange={handleChange}
+        placeholder="Address"
+        className="block w-full p-2 mb-4 border border-gray-300 rounded-md"
+      />  <input
+        type="text"
+        name="city"
+        value={formData.city}
+        onChange={handleChange}
+        placeholder="City"
+        className="block w-full p-2 mb-4 border border-gray-300 rounded-md"
+      />  <input
+        type="text"
+        name="country"
+        value={formData.country}
+        onChange={handleChange}
+        placeholder="Country"
         className="block w-full p-2 mb-4 border border-gray-300 rounded-md"
       />
        <input

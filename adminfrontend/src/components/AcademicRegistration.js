@@ -1,6 +1,8 @@
 import { useState,useEffect } from "react";
 import {toast} from "react-toastify"
 import { Link } from "react-router-dom";
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
 function AcademicRegistration(){
    const [data,setdata]=useState([]);
    const [comments,setComments]=useState([]); 
@@ -9,13 +11,12 @@ function AcademicRegistration(){
 
    const academicReg=async ()=>{
     try {
-     const response=await fetch("http://localhost:8000/academic/academicregistration")
+     const response=await fetch(`${apiUrl}/academic/academicregistration`)
      if(!response.ok){
          toast.error("Data fetching failed")
          throw new console.error("data fetch is failed");
      }
 const data= await response.json();
-
 setFilteredData(data);
   setdata(data);
 }
@@ -33,7 +34,7 @@ catch (error) {
 const handleApprove=async(e,id)=>{
     e.preventDefault();
   try {
-    const response = await fetch(`http://localhost:8000/academic/academicregistrationapproval/${id}`,{
+    const response = await fetch(`${apiUrl}/academic/academicregistrationapproval/${id}`,{
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

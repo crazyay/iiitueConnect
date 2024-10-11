@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import {toast} from "react-toastify"
 import { Link } from "react-router-dom";
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
 export default function HostelReg(){
     const [data,setdata]=useState([]);
    const [comments,setComments]=useState([]); 
@@ -8,7 +10,7 @@ export default function HostelReg(){
    const [filter, setFilter] = useState("");
     const fetchData = async () => {
       try {  
-        const response = await fetch("http://localhost:8000/hostel/hostelregistration");
+        const response = await fetch(`${apiUrl}/hostel/hostelregistration`);
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -27,7 +29,7 @@ export default function HostelReg(){
   const handleApprove=async(e,id)=>{
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:8000/hostel/hostelregistrationapproval/${id}`,{
+      const response = await fetch(`${apiUrl}/hostel/hostelregistrationapproval/${id}`,{
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

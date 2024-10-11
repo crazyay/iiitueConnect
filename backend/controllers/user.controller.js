@@ -80,7 +80,7 @@ const updateUserPassword=asyncHandler(async(req,res)=>{
   if(!isPasswordCorrect){
     throw new apiError(400,"Password is wrong")
   }
-  console.log(isPasswordCorrect);
+  // console.log(isPasswordCorrect);
   
   user.password=newPassword;
     await user.save({validateBeforeSave:false});

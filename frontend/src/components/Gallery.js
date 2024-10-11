@@ -2,6 +2,8 @@ import React from 'react';
 import './styles.css';
 
 function Gallery() {
+  console.log(process.env.REACT_APP_STRIPE_KEY);
+  
   return (
     <div id="wrapper">
       <div className="container">

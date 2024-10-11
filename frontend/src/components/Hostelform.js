@@ -1,5 +1,7 @@
 import { useState,useEffect } from "react";
 import { toast } from "react-toastify";
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
 export default function Hostelform(){
   const initialFormData = {
     rollno: "",
@@ -30,7 +32,7 @@ export default function Hostelform(){
         formData.append("receiptno", data.receiptno);
         formData.append("file", data.file);
 
-        const response = await fetch("http://localhost:8000/hostel/hostelform", {
+        const response = await fetch(`${apiUrl}/hostel/hostelform`, {
           method: "POST",
           body: formData,
         });
@@ -53,8 +55,6 @@ export default function Hostelform(){
         // Handle the error (e.g., show an error message)
       }
   };
-
-   
 
     function updatedata(event){
       // event.preventDefault();

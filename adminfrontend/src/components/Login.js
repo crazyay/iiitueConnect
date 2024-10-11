@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {toast} from "react-toastify"
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
+
 function Login() {
     let [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -16,7 +18,7 @@ function Login() {
     });
 
     const collectData = async () => {
-        let response = await fetch('http://localhost:8000/staff/Login', {
+        let response = await fetch(`${apiUrl}/staff/Login`, {
             method: 'post',
             body: JSON.stringify({ email, password }),
             headers: {

@@ -1,5 +1,6 @@
 import { useEffect, useState,useRef } from "react";
 import {toast } from "react-toastify";
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 export default function Application() {
   const [applications, setApplications] = useState([]);
@@ -7,7 +8,7 @@ export default function Application() {
   const refMessage=useRef();
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8000/academic/application");
+      const response = await fetch(`${apiUrl}/academic/application`);
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
@@ -36,7 +37,7 @@ export default function Application() {
     e.preventDefault();
     try {
 
-      const response = await fetch(`http://localhost:8000/academic/approve-application/${id}`, {
+      const response = await fetch(`${apiUrl}/academic/approve-application/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

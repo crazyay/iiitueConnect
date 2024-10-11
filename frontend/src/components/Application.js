@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { json } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 function ApplicationForm() {
   const initialFormData={
@@ -34,7 +35,7 @@ function ApplicationForm() {
 formdata.forEach((value, key) => {
   formDataJSON[key] = value;
 });
-      const response = await fetch("http://localhost:8000/academic/application", {
+      const response = await fetch(`${apiUrl}/academic/application`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json" // Specify that the content type is JSON
