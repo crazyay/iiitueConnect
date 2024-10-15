@@ -8,9 +8,9 @@ const News = () => {
   ];
 
   const photos = [
-    { id: 1, url: "https://iiitu.ac.in/wp-content/uploads/2022/02/WhatsApp-Image-2022-10-15-at-3.08.22-PM-768x512.jpeg", description: "Description of photo 1." },
+    { id: 1, url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s", description: "Description of photo 1." },
     { id: 2, url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s", description: "Description of photo 2." },
-    { id: 3, url: "https://iiitu.ac.in/wp-content/uploads/2022/11/IMG_3524-768x512.jpg", description: "Description of photo 3." }
+    { id: 3, url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s", description: "Description of photo 3." }
   ];
 
   const pastEvents = [

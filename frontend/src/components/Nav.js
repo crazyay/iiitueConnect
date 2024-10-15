@@ -36,7 +36,7 @@ export default function Nav() {
         }, [clicked]);
 
     return (
-        <div className="sticky top-0">
+        <div className=" z-10 sticky top-0">
             <ul className="flex justify-between bg-blue-500 pl-4 items-center p-2 text-white">
             <div className="flex items-center">
                     <li className="text-xl mr-2 font-bold font-serif"><NavLink to={"/"}><Logo /></NavLink></li>

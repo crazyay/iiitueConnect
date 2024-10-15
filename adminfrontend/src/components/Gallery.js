@@ -7,18 +7,17 @@ function Gallery() {
       <div className="container">
         <h1>GALLERY</h1>
         <div className="gallery">
-          <GalleryItem src="https://iiitu.ac.in/wp-content/uploads/2022/02/WhatsApp-Image-2022-10-15-at-3.08.22-PM-768x512.jpeg" caption="figure1" />
-          <GalleryItem src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s" caption="figure1" />
-          <GalleryItem src="https://iiitu.ac.in/wp-content/uploads/2022/11/IMG_3524-768x512.jpg" caption="figure1" />
-          <GalleryItem src="https://iiitu.ac.in/wp-content/uploads/2022/02/WhatsApp-Image-2022-10-15-at-3.08.22-PM-768x512.jpeg" caption="figure1" />
-          <GalleryItem src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s" caption="figure1" />
-          <GalleryItem src="https://iiitu.ac.in/wp-content/uploads/2022/11/IMG_3524-768x512.jpg" caption="figure1" />
-        
-          <GalleryItem src="https://iiitu.ac.in/wp-content/uploads/2022/02/WhatsApp-Image-2022-10-15-at-3.08.22-PM-768x512.jpeg" caption="figure1" />
-          <GalleryItem src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s" caption="figure1" />
-          <GalleryItem src="https://iiitu.ac.in/wp-content/uploads/2022/11/IMG_3524-768x512.jpg" caption="figure1" />
-        
+         
 
+          <GalleryItem src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s" caption="figure1" />
+          <GalleryItem src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s" caption="figure1" />
+          <GalleryItem src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s" caption="figure1" />
+          <GalleryItem src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s" caption="figure1" />
+          <GalleryItem src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s" caption="figure1" />
+          <GalleryItem src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s" caption="figure1" />
+          <GalleryItem src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s" caption="figure1" />
+          <GalleryItem src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s" caption="figure1" />
+          <GalleryItem src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQMiLMJ1ZqlFRArU4Y-spTDY0K4oEHibWr8zntuNQPQ&s" caption="figure1" />
 
 
 
