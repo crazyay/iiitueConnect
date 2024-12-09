@@ -88,6 +88,8 @@ function Login() {
                                 </div>
 
                                 <button onClick={collectData} className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Login</button>
+                               <p className='pt-2 text-red-500'> Please note: The server may take up to 50 seconds to respond due to inactivity. Thank you for your patience! </p>
+                              
                             </div>
                         </div>
                     </div>
