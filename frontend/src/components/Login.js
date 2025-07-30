@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash, faSpinner } from '@fortawesome/free-solid-svg-icons';
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 function Login() {
-    // console.log(apiUrl);
-    
-    let [email, setEmail] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     let student_name = "";
     let student_roll_no = "";
@@ -20,28 +22,38 @@ function Login() {
     });
 
     const collectData = async () => {
-        let response = await fetch(`${apiUrl}/users/Login`, {
-            method: 'post',
-            body: JSON.stringify({ email, password }),
-            headers: {
-                'content-type': 'application/json'
-            },
-            credentials:'include',
-            
-        });
-      
-       let result = await response.json();
-        console.log(result); 
-      
-        if (response.ok) {
-            student_name = result.email; // Assuming there is a 'name' field in the user object
-            student_roll_no = result.rollNo; // Assuming there is a 'roll_no' field in the user object
-            localStorage.setItem("user", JSON.stringify(result));
-            toast.success("Login Successfully")
-            navigate('/');
-        } else {
-             toast.error("Please enter correct details"); 
-            // alert("Please enter correct details");
+        if (!email || !password) {
+            toast.error("Please fill in all fields");
+            return;
+        }
+
+        setIsLoading(true);
+        
+        try {
+            let response = await fetch(`${apiUrl}/users/Login`, {
+                method: 'post',
+                body: JSON.stringify({ email, password }),
+                headers: {
+                    'content-type': 'application/json'
+                },
+                credentials: 'include',
+            });
+
+            let result = await response.json();
+
+            if (response.ok) {
+                student_name = result.email;
+                student_roll_no = result.rollNo;
+                localStorage.setItem("user", JSON.stringify(result));
+                toast.success("Login Successful!");
+                navigate('/');
+            } else {
+                toast.error(result.message || "Please enter correct details");
+            }
+        } catch (error) {
+            toast.error("Network error. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -52,49 +64,111 @@ function Login() {
     };
       
     return (
-        <div>
-            <section className="bg-gray-50 dark:bg-gray-900">
-                <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                    <a href="/" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-                        <img className="w-8 h-8 mr-2" src="https://upload.wikimedia.org/wikipedia/en/8/83/Indian_Institute_of_Information_Technology%2C_Una_logo.png" alt="logo" />
-                        IIIT UNA
-                    </a>
-                    <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-                        <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-                            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                                Sign in to your account
-                            </h1>
-                            <div className="space-y-4 md:space-y-6">
-                                <div>
-                                    <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                                    <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="22110@iiitu.ac.in" required="" />
-                                </div>
-                                <div>
-                                    <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                                    <input value={password} onChange={(e) => setPassword(e.target.value)} onKeyPress={handleKeyPress} type="password" name="password" id="password" placeholder="123" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="" />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    {/* <div className="flex items-start"> */}
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-8">
+                {/* Header */}
+                <div className="text-center">
+                    <div className="flex justify-center items-center space-x-3 mb-6">
+                        <img 
+                            className="w-12 h-12" 
+                            src="https://upload.wikimedia.org/wikipedia/en/8/83/Indian_Institute_of_Information_Technology%2C_Una_logo.png" 
+                            alt="IIIT Una Logo" 
+                        />
+                        <h1 className="text-3xl font-bold text-gray-800">IIIT Una</h1>
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-700 mb-2">
+                        Welcome Back
+                    </h2>
+                    <p className="text-gray-600">
+                        Sign in to access your student portal
+                    </p>
+                </div>
 
-                                    {  /*  <div className="flex items-center h-5">
-                                            <input id="remember" aria-describedby="remember" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="" />
-                                        </div>*/}
+                {/* Login Form */}
+                <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+                    <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); collectData(); }}>
+                        {/* Email Field */}
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                Email Address
+                            </label>
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-gray-900 placeholder-gray-500"
+                                placeholder="22110@iiitu.ac.in"
+                                required
+                                disabled={isLoading}
+                            />
+                        </div>
 
-                                        {/* <div className="ml-3 text-sm">
-                                            <label htmlFor="remember" className="text-gray-500 dark:text-gray-300">Remember me</label>
-                                        </div> */}
-                                    {/* </div> */}
-                                    {/* <a href="/" className="text-sm font-medium text-blue-500 hover:underline dark:text-primary-500">Forgot password?</a> */}
-                                </div>
-
-                                <button onClick={collectData} className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Login</button>
-                               <p className='pt-2 text-red-500'> Please note: The server may take up to 50 seconds to respond due to inactivity. Thank you for your patience! </p>
-                              
+                        {/* Password Field */}
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                                Password
+                            </label>
+                            <div className="relative">
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    onKeyPress={handleKeyPress}
+                                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-gray-900 placeholder-gray-500"
+                                    placeholder="Enter your password"
+                                    required
+                                    disabled={isLoading}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                                    disabled={isLoading}
+                                >
+                                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="text-sm" />
+                                </button>
                             </div>
                         </div>
-                    </div>
+
+                        {/* Login Button */}
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:scale-100 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                        >
+                            {isLoading ? (
+                                <>
+                                    <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
+                                    <span>Signing In...</span>
+                                </>
+                            ) : (
+                                <span>Sign In</span>
+                            )}
+                        </button>
+
+                        {/* Server Notice */}
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                            <p className="text-sm text-amber-700 text-center">
+                                <strong>Note:</strong> The server may take up to 50 seconds to respond due to inactivity. Thank you for your patience!
+                            </p>
+                        </div>
+                    </form>
                 </div>
-            </section>
+
+                {/* Footer */}
+                <div className="text-center">
+                    <p className="text-sm text-gray-600">
+                        Need help? Contact{' '}
+                        <a href="mailto:support@iiitu.ac.in" className="text-blue-600 hover:text-blue-700 font-medium">
+                            IT Support
+                        </a>
+                    </p>
+                </div>
+            </div>
         </div>
     );
 }

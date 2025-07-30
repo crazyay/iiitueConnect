@@ -26,7 +26,7 @@ import News from './components/News';
 import Gallery from './components/Gallery';
 import Success from './components/Success';
 import Failure from  './components/Failure'
-import Header from './components/Header';
+
 import Changepassword from './components/ChangePassword';
 function App() {
   const placements = [
@@ -51,7 +51,6 @@ function App() {
 
     <BrowserRouter>
     <Nav />
-    <Header />
          <Routes>
           <Route element={<Private />}>
           <Route path='/' element={<Home />} /> 

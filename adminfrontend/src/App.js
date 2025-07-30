@@ -1,6 +1,6 @@
 // import logo from './logo.svg';
 import './App.css';
-import Header from './components/Header';
+
 import { Routes,Route, BrowserRouter } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
@@ -38,7 +38,6 @@ function App() {
     <div>
   <BrowserRouter>
   <Nav />
-  <Header />
   <Routes>
   <Route element={<Private />}>
   <Route path='/' element={<Home/>} />

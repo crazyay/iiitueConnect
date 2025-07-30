@@ -84,6 +84,7 @@ const {email,password}= req.body;
 if(!(email)){
   return res.status(401).json({ success: false, message: 'Authentication failed' });
 }
+console.log("user found",email);
 
 const user=await Staff.findOne({email})
 if(!user){ 
