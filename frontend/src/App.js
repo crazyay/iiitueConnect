@@ -1,5 +1,5 @@
 import './App.css';
-import {BrowserRouter,Routes,Route,useParams} from "react-router-dom"
+import {BrowserRouter,Routes,Route,useParams,useLocation} from "react-router-dom"
 import Nav from './components/Nav';
 import Home from './components/Home'
 // import Registration from './components/Registration';
@@ -15,7 +15,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import ComplaintForm from './components/Complaint';
 import Registrationtype from './components/Registrationtype';
-import HostelReg from './components/HostelReg';
+import Hostelform from './components/Hostelform';
 import Placements from './components/Placements'
 import apple from './components/Apple-Logo.png'
 import netflix from './components/netflix.jpg'
@@ -26,16 +26,17 @@ import News from './components/News';
 import Gallery from './components/Gallery';
 import Success from './components/Success';
 import Failure from  './components/Failure'
-
 import Changepassword from './components/ChangePassword';
-function App() {
+
+function AppContent() {
+  const location = useLocation();
+  const isLoginPage = location.pathname === '/Login';
+  
   const placements = [
     { name: 'Student A', company: 'Company A', package: 'Rs.15,00,000', logo:apple },
     { name: 'Student B', company: 'Company B', package: 'Rs.45,00,000', logo: netflix },
     { name: 'Student C', company: 'Company C', package: 'Rs.80,00,000', logo: google },
     { name: 'Student C', company: 'Company C', package: 'Rs.20,00,000', logo: google }
-
-
     // Add more placement data as needed
   ];
  
@@ -49,14 +50,13 @@ function App() {
         </div>
   <div classname="overflow-y-hidden">
 
-    <BrowserRouter>
-    <Nav />
+    {!isLoginPage && <Nav />}
          <Routes>
           <Route element={<Private />}>
           <Route path='/' element={<Home />} /> 
           <Route path='/Registration' element= {<Registrationtype />} />
           <Route path='/Registration/academic' element= {<Academicform />} />
-          <Route path='/Registration/hostel' element= {<HostelReg />} />
+          <Route path='/Registration/hostel' element= {<Hostelform />} />
           <Route path='/Complaint' element= {<ComplaintForm />} />
           <Route path='/Placements' element= {<Placements placements={placements} />} />
           <Route path='/Fees' element= {<Fees />} />
@@ -65,17 +65,22 @@ function App() {
           <Route path='/success' element= {<Success />} />
           <Route path='/failure' element= {<Failure />} />
           <Route path='/changepassword' element= {<Changepassword />} />
-           
-
           <Route path='/application' element= {<Application/>} />
           </Route>
           <Route path='/Login' element= {<Login/>} />
         
          </Routes>
-    </BrowserRouter>
-    <Footer/>
+    {!isLoginPage && <Footer/>}
       </div>
       </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }
 

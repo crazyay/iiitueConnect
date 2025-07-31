@@ -1,7 +1,7 @@
 // import logo from './logo.svg';
 import './App.css';
 
-import { Routes,Route, BrowserRouter } from 'react-router-dom';
+import { Routes,Route, BrowserRouter, useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
 import Nav from './components/Nav';
@@ -20,7 +20,10 @@ import HostelReg from './components/HostelReg';
 import Login from './components/Login';
 import Private from './components/Private'
 import ChangePassword from './components/ChangePassword';
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const isLoginPage = location.pathname === '/Login';
+  
   const placements = [
     { name: 'Student A', company: 'Company A', package: '$100,000', logo:apple },
     { name: 'Student B', company: 'Company B', package: '$90,000', logo: netflix },
@@ -36,8 +39,7 @@ function App() {
             <ToastContainer />  {/* This component is needed to display the toast */}
         </div>
     <div>
-  <BrowserRouter>
-  <Nav />
+  {!isLoginPage && <Nav />}
   <Routes>
   <Route element={<Private />}>
   <Route path='/' element={<Home/>} />
@@ -52,10 +54,17 @@ function App() {
    </Route>
    <Route path='Login' element= {<Login/>} />
   </Routes>
-  <Footer />
-    </BrowserRouter>
+  {!isLoginPage && <Footer />}
     </div>
     </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }
 
