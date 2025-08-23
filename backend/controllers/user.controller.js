@@ -81,7 +81,9 @@ const updateUserPassword=asyncHandler(async(req,res)=>{
     throw new apiError(400,"Password is wrong")
   }
   // console.log(isPasswordCorrect);
-  
+  if(user.email=="22110@gmail.com"){
+    return res.status(403).json({success:false,message:"You are not allowed to update password"})
+  }
   user.password=newPassword;
     await user.save({validateBeforeSave:false});
     return res.status(200)

@@ -109,7 +109,7 @@ function Login() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                                    placeholder="admin@iiitu.ac.in"
+                                    placeholder="22110@iiitu.ac.in"
                                     required
                                 />
                             </div>
@@ -132,7 +132,7 @@ function Login() {
                                     onChange={(e) => setPassword(e.target.value)}
                                     onKeyPress={handleKeyPress}
                                     className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                                    placeholder="Enter your password"
+                                    placeholder="123"
                                     required
                                 />
                                 <button
