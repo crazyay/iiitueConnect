@@ -8,6 +8,9 @@ const {upload}=require('../middleware/fileupload.middleware')
 const router=express.Router()
 
 router.route("/hostelform").post(upload.single('file'), hostelRegistration);
+// Get paginated hostel registrations
+// Query params: page (default: 1), limit (default: 10)
+// Example: /hostelregistration?page=1&limit=10
 router.route("/hostelregistration").get(getHostelRegistration)
 router.route("/hostelregistrationapproval/:id").put(sendEmailMiddleware(hostelmodel),hostelRegistrationApproved)
 router.route("/complaint").post(complaints)

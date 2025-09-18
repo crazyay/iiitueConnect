@@ -47,31 +47,52 @@ const academicRegistration=async(req,res)=>{
        return res.status(500).send("Error uploading file: " + error.message);
     }
 }
-const getAcademicRegistrations=asyncHandler( async(req,res)=>{
+const getAcademicRegistrations = asyncHandler(async (req, res) => {
     try {
-        // Fetch all registrations from the database
-        let registrations = await academicmodel.find();
-              
-        // Filter registrations based on query parameters (batch, semester, rollno)
-        const { batch, semester, rollno,branch } = req.query;
-        if (batch) {
-          registrations = registrations.filter((registration) => registration.batch.toLowerCase().includes(batch.toLowerCase()));
-        }
-        if (semester) {
-          registrations = registrations.filter((registration) => registration.semester.toLowerCase().includes(semester.toLowerCase()));
-        }
-        if (branch) {
-          registrations = registrations.filter((registration) => registration.branch.toLowerCase().includes(branch.toLowerCase()));
-        }
-        if (rollno) {
-          registrations = registrations.filter((registration) => registration.rollno.toLowerCase().includes(rollno.toLowerCase()));
-        }
-        //  console.log(registrations);
-        res.json(registrations);
-      } catch (error) {
-        // console.error("Error fetching registrations:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
+        // Get pagination parameters
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        
+        // Build query based on filters
+        const query = {};
+        const { batch, semester, rollno, branch } = req.query;
+        
+        if (batch) query.batch = { $regex: new RegExp(batch, 'i') };
+        if (semester) query.semester = { $regex: new RegExp(semester, 'i') };
+        if (branch) query.branch = { $regex: new RegExp(branch, 'i') };
+        if (rollno) query.rollno = { $regex: new RegExp(rollno, 'i') };
+        
+        // Get total count and paginated results in parallel
+        const [total, registrations] = await Promise.all([
+            academicmodel.countDocuments(query),
+            academicmodel.find(query)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean()
+        ]);
+        
+        const totalPages = Math.ceil(total / limit);
+        
+        res.json({
+            success: true,
+            data: registrations,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalItems: total,
+                itemsPerPage: limit
+            }
+        });
+    } catch (error) {
+        console.error('Error in getAcademicRegistrations:', error);
+        res.status(500).json({ 
+            success: false,
+            error: "Error fetching academic registrations",
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
 })
 const academicRegApproved=asyncHandler(async(req,res)=>{
     // console.log("hello");

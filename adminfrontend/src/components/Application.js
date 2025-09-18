@@ -23,21 +23,43 @@ export default function Application() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [processingIds, setProcessingIds] = useState(new Set());
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 10
+  });
   const refMessage = useRef();
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${apiUrl}/academic/application`);
+      const { currentPage, itemsPerPage } = pagination;
+      const queryParams = new URLSearchParams({
+        page: currentPage,
+        limit: itemsPerPage,
+        status: statusFilter === 'all' ? '' : statusFilter,
+        search: searchTerm
+      });
+
+      const response = await fetch(`${apiUrl}/academic/application?${queryParams}`);
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
-      const data = await response.json();
+      const { data, total, page, pages } = await response.json();
+      
       setApplications(data);
       setFilteredApplications(data);
+      setPagination(prev => ({
+        ...prev,
+        totalPages: pages,
+        totalItems: total,
+        currentPage: page
+      }));
+      
       // Initialize comments object with empty strings for each application ID
       const initialComments = {};
       data.forEach((app) => {
-        initialComments[app._id] = "";
+        initialComments[app._id] = app.comment || "";
       });
       setComments(initialComments);
     } catch (error) {
@@ -100,33 +122,155 @@ export default function Application() {
     setComments({ ...comments, [id]: value });
   };
 
-  // Filter applications based on search term and status
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    setPagination(prev => ({
+      ...prev,
+      currentPage: newPage
+    }));
+  };
+
+  // Handle items per page change
+  const handleItemsPerPageChange = (e) => {
+    setPagination(prev => ({
+      ...prev,
+      itemsPerPage: parseInt(e.target.value),
+      currentPage: 1
+    }));
+  };
+
+  // Fetch data when pagination or filters change
   useEffect(() => {
-    let filtered = applications;
-    
-    if (searchTerm) {
-      filtered = filtered.filter(app => 
-        app.rollno?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.message?.toLowerCase().includes(searchTerm.toLowerCase())
+    fetchData();
+  }, [pagination.currentPage, pagination.itemsPerPage, statusFilter, searchTerm]);
+
+  // Render pagination controls
+  const renderPagination = () => {
+    if (pagination.totalPages <= 1) return null;
+
+    const pages = [];
+    const { currentPage, totalPages } = pagination;
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    // First page
+    if (startPage > 1) {
+      pages.push(
+        <button
+          key={1}
+          onClick={() => handlePageChange(1)}
+          className="px-3 py-1 border rounded-md text-sm font-medium"
+        >
+          1
+        </button>
+      );
+      if (startPage > 2) {
+        pages.push(<span key="start-ellipsis" className="px-2">...</span>);
+      }
+    }
+
+    // Middle pages
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`px-3 py-1 border rounded-md text-sm font-medium ${
+            i === currentPage
+              ? 'bg-blue-600 text-white border-blue-600'
+              : 'bg-white text-gray-700 hover:bg-gray-50'
+          }`}
+        >
+          {i}
+        </button>
       );
     }
-    
-    if (statusFilter !== "all") {
-      filtered = filtered.filter(app => {
-        if (statusFilter === "approved") return app.approved;
-        if (statusFilter === "pending") return !app.approved;
-        return true;
-      });
+
+    // Last page
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(<span key="end-ellipsis" className="px-2">...</span>);
+      }
+      pages.push(
+        <button
+          key={totalPages}
+          onClick={() => handlePageChange(totalPages)}
+          className="px-3 py-1 border rounded-md text-sm font-medium"
+        >
+          {totalPages}
+        </button>
+      );
     }
-    
-    setFilteredApplications(filtered);
-  }, [applications, searchTerm, statusFilter]);
+
+    return (
+      <div className="flex items-center justify-between mt-4">
+        <div className="flex-1">
+          <span className="text-sm text-gray-700">
+            Showing <span className="font-medium">
+              {filteredApplications.length === 0 ? 0 : (pagination.currentPage - 1) * pagination.itemsPerPage + 1}
+            </span> to <span className="font-medium">
+              {Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)}
+            </span> of <span className="font-medium">{pagination.totalItems}</span> results
+          </span>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <select
+            value={pagination.itemsPerPage}
+            onChange={handleItemsPerPageChange}
+            className="text-sm border rounded-md px-2 py-1"
+          >
+            <option value="5">5 per page</option>
+            <option value="10">10 per page</option>
+            <option value="20">20 per page</option>
+            <option value="50">50 per page</option>
+          </select>
+          
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => handlePageChange(1)}
+              disabled={pagination.currentPage === 1}
+              className="px-2 py-1 border rounded-md text-sm disabled:opacity-50"
+            >
+              «
+            </button>
+            <button
+              onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
+              disabled={pagination.currentPage === 1}
+              className="px-2 py-1 border rounded-md text-sm disabled:opacity-50"
+            >
+              ‹
+            </button>
+            {pages}
+            <button
+              onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.currentPage + 1))}
+              disabled={pagination.currentPage >= pagination.totalPages}
+              className="px-2 py-1 border rounded-md text-sm disabled:opacity-50"
+            >
+              ›
+            </button>
+            <button
+              onClick={() => handlePageChange(pagination.totalPages)}
+              disabled={pagination.currentPage >= pagination.totalPages}
+              className="px-2 py-1 border rounded-md text-sm disabled:opacity-50"
+            >
+              »
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const getStats = () => {
-    const total = applications.length;
-    const approved = applications.filter(app => app.approved).length;
+    const apps = applications || [];
+    const total = apps.length;
+    const approved = apps.filter(app => app.approved).length;
     const pending = total - approved;
     return { total, approved, pending };
   };
@@ -205,15 +349,38 @@ export default function Application() {
         </div>
 
         {/* Applications Grid */}
-        {isLoading ? (
-          <div className="flex justify-center items-center py-16">
-            <div className="text-center">
-              <FontAwesomeIcon icon={faSpinner} className="text-4xl text-blue-600 animate-spin mb-4" />
-              <p className="text-gray-600">Loading applications...</p>
-            </div>
-          </div>
-        ) : filteredApplications.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {(() => {
+          if (isLoading) {
+            return (
+              <div className="flex justify-center items-center py-16">
+                <div className="text-center">
+                  <FontAwesomeIcon icon={faSpinner} className="text-4xl text-blue-600 animate-spin mb-4" />
+                  <p className="text-gray-600">Loading applications...</p>
+                </div>
+              </div>
+            );
+          }
+          
+          if (!filteredApplications || filteredApplications.length === 0) {
+            return (
+              <div className="text-center py-16">
+                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <FontAwesomeIcon icon={faFileAlt} className="text-4xl text-gray-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                  {searchTerm || statusFilter !== "all" ? "No matching applications" : "No applications found"}
+                </h3>
+                <p className="text-gray-600">
+                  {searchTerm || statusFilter !== "all" 
+                    ? "Try adjusting your search or filter criteria" 
+                    : "Applications will appear here when students submit them"}
+                </p>
+              </div>
+            );
+          }
+          
+          return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredApplications.map((app) => (
               <div key={app._id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
                 {/* Card Header */}
@@ -318,22 +485,12 @@ export default function Application() {
                 </div>
               </div>
             ))}
+            
+            {/* Pagination */}
+            {renderPagination()}
           </div>
-        ) : (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <FontAwesomeIcon icon={faFileAlt} className="text-4xl text-gray-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">
-              {searchTerm || statusFilter !== "all" ? "No matching applications" : "No applications found"}
-            </h3>
-            <p className="text-gray-600">
-              {searchTerm || statusFilter !== "all" 
-                ? "Try adjusting your search or filter criteria" 
-                : "Applications will appear here when students submit them"}
-            </p>
-          </div>
-        )}
+        );
+        })()}
       </div>
     </div>
   );

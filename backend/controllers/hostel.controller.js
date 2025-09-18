@@ -46,9 +46,51 @@ const hostelRegistration=asyncHandler(async(req,res)=>{
         res.status(500).send("Error uploading file: " + error.message);
     }
 })
-const getHostelRegistration=asyncHandler(async(req,res)=>{
-    const registeredStudents=await hostelmodel.find();
-  res.status(200).json(registeredStudents);
+const getHostelRegistration = asyncHandler(async (req, res) => {
+    try {
+        console.log('Received request with query params:', req.query);
+        
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        
+        console.log(`Fetching page ${page} with limit ${limit}, skip ${skip}`);
+        
+        // Get total count and paginated results in parallel
+        const [total, registeredStudents] = await Promise.all([
+            hostelmodel.countDocuments(),
+            hostelmodel.find()
+                .skip(skip)
+                .limit(limit)
+                .sort({ createdAt: -1 })
+                .lean()
+        ]);
+        
+        const totalPages = Math.ceil(total / limit);
+        
+        console.log(`Found ${total} total records, ${registeredStudents.length} in this page`);
+        
+        const response = {
+            success: true,
+            data: registeredStudents,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalItems: total,
+                itemsPerPage: limit
+            }
+        };
+        
+        res.status(200).json(response);
+        
+    } catch (error) {
+        console.error('Error in getHostelRegistration:', error);
+        res.status(500).json({ 
+            success: false,
+            error: "Error fetching hostel registrations",
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
 })
 const complaints=asyncHandler(async(req,res)=>{
     const data=await req.body;
@@ -57,18 +99,51 @@ const complaints=asyncHandler(async(req,res)=>{
   const result=await complaintdata.save();
   res.send("complaint registered");
 })
-const getComplaints=asyncHandler(async(req,res)=>{
+const getComplaints = asyncHandler(async (req, res) => {
     try {
-        const pa=req.params.page;
-        // console.log(pa);
-        const complaint = await complaintmodel.find({type:{ $regex: new RegExp(req.params.page, "i") }}).sort({createdAt: 1 });
-        // console.log("complaint");
-        // console.log(complaint);
-        res.json(complaint);  
-      } catch (error) {
-        // console.error("Error fetching complaints:", error);
-        res.status(500).json({ error: "Error fetching complaints" });
-      }
+        console.log('Received complaints request with params:', req.params, 'query:', req.query);
+        
+        const type = req.params.page;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        
+        const query = type ? { type: { $regex: new RegExp(type, "i") } } : {};
+        
+        console.log('Querying complaints with:', { type, page, limit, skip, query });
+        
+        // Get total count and paginated results in parallel
+        const [total, complaints] = await Promise.all([
+            complaintmodel.countDocuments(query),
+            complaintmodel.find(query)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean()
+        ]);
+        
+        const totalPages = Math.ceil(total / limit);
+        
+        console.log(`Found ${total} complaints, returning ${complaints.length} items`);
+        
+        res.json({
+            success: true,
+            data: complaints,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalItems: total,
+                itemsPerPage: limit
+            }
+        });  
+    } catch (error) {
+        console.error('Error in getComplaints:', error);
+        res.status(500).json({ 
+            success: false,
+            error: "Error fetching complaints",
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
 })
 const hostelRegistrationApproved=asyncHandler(async(req,res)=>{
     // console.log(req.params.id);

@@ -10,359 +10,436 @@ import {
     faPhone, 
     faComment, 
     faCheck, 
-    faFilter,
     faSpinner,
     faClock,
-    faTools
+    faTools,
+    faChevronLeft,
+    faChevronRight
 } from '@fortawesome/free-solid-svg-icons';
+
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
-export default function Complaint(){
-  const { page } = useParams();
-  const [complaint, setComplaint] = useState([]);
-  const [filteredComplaints, setFilteredComplaints] = useState([]);
-  const [comments, setComments] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [isLoading, setIsLoading] = useState(true);
-  const [processingIds, setProcessingIds] = useState(new Set());  
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {  
-        const response = await fetch(`${apiUrl}/hostel/Complaint/${page}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const data = await response.json();
-        setComplaint(data);
-        setFilteredComplaints(data);
-        
-        // Initialize comments object
-        const initialComments = {};
-        data.forEach((comp) => {
-          initialComments[comp._id] = "";
-        });
-        setComments(initialComments);
-        
-        console.log(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to fetch complaints");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    const handleApprove = async (e, id) => {
-      e.preventDefault();
-      
-      if (!comments[id]?.trim()) {
-        toast.error("Please add a resolution comment");
-        return;
-      }
-
-      setProcessingIds(prev => new Set([...prev, id]));
-      try {
-        const response = await fetch(`${apiUrl}/hostel/resolve-complaint/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ comment: comments[id] }),
-        });
-        
-        if (response.ok) {
-          toast.success("Complaint resolved successfully!");
-          fetchData();
-        } else {
-          toast.error("Complaint resolution failed");
-          throw new Error("Failed to resolve complaint");
-        }
-      } catch (error) {
-        toast.error("Complaint resolution failed");
-        console.error("Error resolving complaint:", error);
-      } finally {
-        setProcessingIds(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(id);
-          return newSet;
-        });
-      }
-    };
-
-
-  useEffect(() => {
-   
-    fetchData();
-  
-  },[page]);
-
-   const handleCommentChange = (e, id) => {
-    const { value } = e.target;
-    setComments({ ...comments, [id]: value });
-   };
-
-   // Filter complaints based on search term and status
-   useEffect(() => {
-    let filtered = complaint;
+export default function Complaint() {
+    const { page } = useParams();
+    const [complaints, setComplaints] = useState([]);
+    const [comments, setComments] = useState({});
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [isLoading, setIsLoading] = useState(true);
+    const [processingIds, setProcessingIds] = useState(new Set());
     
-    if (searchTerm) {
-      filtered = filtered.filter(comp => 
-        comp.rollno?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        comp.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        comp.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        comp.complaintdesc?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        comp.phone?.includes(searchTerm)
-      );
-    }
-    
-    if (statusFilter !== "all") {
-      filtered = filtered.filter(comp => {
-        if (statusFilter === "resolved") return comp.resolved;
-        if (statusFilter === "pending") return !comp.resolved;
-        return true;
-      });
-    }
-    
-    setFilteredComplaints(filtered);
-  }, [complaint, searchTerm, statusFilter]);
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        itemsPerPage: 10
+    });
 
-  const getStats = () => {
-    const total = complaint.length;
-    const resolved = complaint.filter(comp => comp.resolved).length;
-    const pending = total - resolved;
-    return { total, resolved, pending };
-  };
-
-  const stats = getStats();
-
-  const getComplaintTypeIcon = (type) => {
-    switch(type?.toLowerCase()) {
-      case 'civil': return faTools;
-      case 'electrical': return faTools;
-      case 'wifi': return faTools;
-      default: return faExclamationTriangle;
-    }
-  };
-
-  const getComplaintTypeColor = (type) => {
-    switch(type?.toLowerCase()) {
-      case 'civil': return 'from-orange-500 to-orange-600';
-      case 'electrical': return 'from-yellow-500 to-yellow-600';
-      case 'wifi': return 'from-red-500 to-red-600';
-      default: return 'from-gray-500 to-gray-600';
-    }
-  };
-
-
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex justify-center items-center space-x-3 mb-4">
-              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                <FontAwesomeIcon icon={faExclamationTriangle} className="text-2xl" />
-              </div>
-              <h1 className="text-4xl font-bold">{page} Complaints Management</h1>
-            </div>
-            <p className="text-xl text-blue-100 mb-8">
-              Review and resolve {page.toLowerCase()} complaints from students
-            </p>
+    // Fetch complaints with pagination
+    const fetchComplaints = async (pageNumber = 1) => {
+        setIsLoading(true);
+        try {
+            // The backend expects the complaint type as a URL parameter and pagination as query params
+            const url = `${apiUrl}/hostel/Complaint/${page || 'all'}?page=${pageNumber}&limit=${pagination.itemsPerPage}`;
+            console.log('Fetching complaints from:', url);
             
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-              <div className="bg-white bg-opacity-10 rounded-lg p-6 backdrop-blur-sm">
-                <div className="text-3xl font-bold mb-2">{stats.total}</div>
-                <div className="text-blue-100">Total Complaints</div>
-              </div>
-              <div className="bg-white bg-opacity-10 rounded-lg p-6 backdrop-blur-sm">
-                <div className="text-3xl font-bold mb-2 text-green-300">{stats.resolved}</div>
-                <div className="text-blue-100">Resolved</div>
-              </div>
-              <div className="bg-white bg-opacity-10 rounded-lg p-6 backdrop-blur-sm">
-                <div className="text-3xl font-bold mb-2 text-yellow-300">{stats.pending}</div>
-                <div className="text-blue-100">Pending Resolution</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Search and Filter Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search Input */}
-            <div className="flex-1 relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
-              </div>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                placeholder="Search by roll number, name, email, phone, or complaint..."
-              />
-            </div>
+            const response = await fetch(url, {
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            });
             
-            {/* Status Filter */}
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FontAwesomeIcon icon={faFilter} className="text-gray-400" />
-              </div>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
-              >
-                <option value="all">All Complaints</option>
-                <option value="pending">Pending Resolution</option>
-                <option value="resolved">Resolved</option>
-              </select>
-            </div>
-          </div>
-        </div>
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error response:', errorText);
+                throw new Error(`Failed to fetch complaints: ${response.status} ${response.statusText}`);
+            }
+            
+            const responseData = await response.json();
+            console.log('Complaints response data:', responseData);
+            
+            if (!responseData || !responseData.success || !Array.isArray(responseData.data)) {
+                console.error('Invalid response format or error from server:', responseData);
+                throw new Error(responseData?.error || 'Invalid response format from server');
+            }
+            
+            const { data, pagination: paginationData } = responseData;
+            
+            setComplaints(Array.isArray(data) ? data : []);
+            
+            if (paginationData) {
+                setPagination(prev => ({
+                    ...prev,
+                    currentPage: parseInt(paginationData.currentPage) || 1,
+                    totalPages: paginationData.totalPages || 1,
+                    totalItems: paginationData.totalItems || 0,
+                    itemsPerPage: paginationData.itemsPerPage || 10
+                }));
+            }
+            
+            // Initialize comments
+            const initialComments = {};
+            data.forEach(comp => {
+                initialComments[comp._id] = "";
+            });
+            setComments(initialComments);
+            
+        } catch (error) {
+            console.error("Error fetching complaints:", error);
+            toast.error("Failed to load complaints");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-        {/* Complaints Grid */}
-        {isLoading ? (
-          <div className="flex justify-center items-center py-16">
-            <div className="text-center">
-              <FontAwesomeIcon icon={faSpinner} className="text-4xl text-blue-600 animate-spin mb-4" />
-              <p className="text-gray-600">Loading complaints...</p>
-            </div>
-          </div>
-        ) : filteredComplaints.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredComplaints.map((item, index) => (
-              <div key={item._id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                {/* Card Header */}
-                <div className={`bg-gradient-to-r ${getComplaintTypeColor(page)} text-white p-4`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <FontAwesomeIcon icon={getComplaintTypeIcon(page)} className="text-sm" />
-                      <span className="text-sm font-semibold">{page} Issue</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <FontAwesomeIcon icon={faClock} className="text-sm" />
-                      <span className="text-sm">{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold flex items-center space-x-2">
-                      <FontAwesomeIcon icon={faUser} />
-                      <span>{item.rollno}</span>
-                    </h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                      item.resolved 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {item.resolved ? 'Resolved' : 'Pending'}
-                    </span>
-                  </div>
-                </div>
+    // Handle page change
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= pagination.totalPages) {
+            fetchComplaints(newPage);
+        }
+    };
 
-                {/* Card Body */}
-                <div className="p-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">Student Name:</h4>
-                      <p className="text-gray-600">{item.name}</p>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">Complaint Description:</h4>
-                      <div className="max-h-32 overflow-y-auto bg-gray-50 rounded-lg p-3">
-                        <p className="text-gray-600 text-sm">{item.complaintdesc}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 gap-2">
-                      <div className="flex items-center space-x-2 text-gray-600">
-                        <FontAwesomeIcon icon={faEnvelope} className="text-sm" />
-                        <span className="text-sm">{item.email}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-gray-600">
-                        <FontAwesomeIcon icon={faPhone} className="text-sm" />
-                        <span className="text-sm">{item.phone}</span>
-                      </div>
-                    </div>
-                  </div>
+    // Handle complaint resolution
+    const handleResolve = async (e, id) => {
+        e.preventDefault();
+        
+        if (!comments[id]?.trim()) {
+            toast.error("Please add a resolution comment");
+            return;
+        }
 
-                  {/* Resolution Section */}
-                  {!item.resolved && (
-                    <div className="mt-6 pt-6 border-t border-gray-200">
-                      <div className="space-y-3">
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <FontAwesomeIcon icon={faComment} className="text-gray-400" />
-                          </div>
-                          <textarea
-                            value={comments[item._id] || ''}
-                            onChange={(e) => handleCommentChange(e, item._id)}
-                            className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none"
-                            placeholder="Add resolution comment..."
-                            rows={3}
-                          />
-                        </div>
-                        
+        setProcessingIds(prev => new Set([...prev, id]));
+        
+        try {
+            const response = await fetch(`${apiUrl}/hostel/resolve-complaint/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ comment: comments[id] })
+            });
+            
+            if (response.ok) {
+                toast.success("Complaint resolved successfully!");
+                fetchComplaints(pagination.currentPage);
+            } else {
+                throw new Error("Failed to resolve complaint");
+            }
+        } catch (error) {
+            console.error("Error resolving complaint:", error);
+            toast.error("Failed to resolve complaint");
+        } finally {
+            setProcessingIds(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(id);
+                return newSet;
+            });
+        }
+    };
+
+    // Handle comment change
+    const handleCommentChange = (e, id) => {
+        setComments(prev => ({
+            ...prev,
+            [id]: e.target.value
+        }));
+    };
+
+    // Filter complaints based on search and status
+    const filteredComplaints = Array.isArray(complaints) ? complaints.filter(complaint => {
+        if (!complaint) return false;
+        
+        const searchLower = searchTerm.toLowerCase();
+        const matchesSearch = searchTerm === "" || 
+            (complaint.name?.toLowerCase()?.includes(searchLower) ||
+            complaint.rollno?.toLowerCase()?.includes(searchLower) ||
+            complaint.subject?.toLowerCase()?.includes(searchLower) ||
+            complaint.description?.toLowerCase()?.includes(searchLower));
+            
+        const matchesStatus = statusFilter === "all" ||
+            (statusFilter === "resolved" && complaint.resolved) ||
+            (statusFilter === "pending" && !complaint.resolved);
+            
+        return matchesSearch && matchesStatus;
+    }) : [];
+
+    // Get statistics
+    const stats = {
+        total: complaints.length,
+        resolved: complaints.filter(comp => comp.resolved).length,
+        pending: complaints.filter(comp => !comp.resolved).length
+    };
+
+    // Initial data fetch
+    useEffect(() => {
+        fetchComplaints(1);
+    }, [page, pagination.itemsPerPage]);
+
+    // Render pagination controls
+    const renderPagination = () => {
+        const pages = [];
+        const maxPages = 5;
+        let startPage = Math.max(1, pagination.currentPage - Math.floor(maxPages / 2));
+        let endPage = Math.min(pagination.totalPages, startPage + maxPages - 1);
+        
+        if (endPage - startPage + 1 < maxPages) {
+            startPage = Math.max(1, endPage - maxPages + 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(
+                <button
+                    key={i}
+                    onClick={() => handlePageChange(i)}
+                    className={`px-3 py-1 rounded ${
+                        pagination.currentPage === i
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-white hover:bg-gray-100'
+                    }`}
+                >
+                    {i}
+                </button>
+            );
+        }
+
+        return (
+            <div className="flex justify-center items-center gap-2 mt-6">
+                <button
+                    onClick={() => handlePageChange(pagination.currentPage - 1)}
+                    disabled={pagination.currentPage === 1}
+                    className="px-3 py-1 bg-white rounded disabled:opacity-50"
+                >
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                </button>
+                
+                {startPage > 1 && (
+                    <>
                         <button
-                          onClick={(e) => handleApprove(e, item._id)}
-                          disabled={processingIds.has(item._id) || !comments[item._id]?.trim()}
-                          className={`w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-semibold text-white transition-all duration-200 ${
-                            processingIds.has(item._id) || !comments[item._id]?.trim()
-                              ? 'bg-gray-400 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 transform hover:scale-105 shadow-lg hover:shadow-xl'
-                          }`}
+                            onClick={() => handlePageChange(1)}
+                            className="px-3 py-1 bg-white rounded"
                         >
-                          {processingIds.has(item._id) ? (
-                            <>
-                              <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-                              <span>Resolving...</span>
-                            </>
-                          ) : (
-                            <>
-                              <FontAwesomeIcon icon={faCheck} />
-                              <span>Resolve Complaint</span>
-                            </>
-                          )}
+                            1
                         </button>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Resolved Status */}
-                  {item.resolved && (
-                    <div className="mt-6 pt-6 border-t border-gray-200">
-                      <div className="flex items-center justify-center space-x-2 text-green-600">
-                        <FontAwesomeIcon icon={faCheck} className="text-lg" />
-                        <span className="font-semibold">Complaint Resolved</span>
-                      </div>
-                    </div>
-                  )}
+                        {startPage > 2 && <span>...</span>}
+                    </>
+                )}
+                
+                {pages}
+                
+                {endPage < pagination.totalPages && (
+                    <>
+                        {endPage < pagination.totalPages - 1 && <span>...</span>}
+                        <button
+                            onClick={() => handlePageChange(pagination.totalPages)}
+                            className="px-3 py-1 bg-white rounded"
+                        >
+                            {pagination.totalPages}
+                        </button>
+                    </>
+                )}
+                
+                <button
+                    onClick={() => handlePageChange(pagination.currentPage + 1)}
+                    disabled={pagination.currentPage === pagination.totalPages}
+                    className="px-3 py-1 bg-white rounded disabled:opacity-50"
+                >
+                    <FontAwesomeIcon icon={faChevronRight} />
+                </button>
+                
+                <div className="ml-4 text-sm text-gray-600">
+                    Showing {((pagination.currentPage - 1) * pagination.itemsPerPage) + 1} to {
+                        Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)
+                    } of {pagination.totalItems} complaints
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <FontAwesomeIcon icon={faExclamationTriangle} className="text-4xl text-gray-400" />
+                
+                <select
+                    value={pagination.itemsPerPage}
+                    onChange={(e) => {
+                        setPagination(prev => ({
+                            ...prev,
+                            itemsPerPage: parseInt(e.target.value),
+                            currentPage: 1
+                        }));
+                    }}
+                    className="ml-4 px-2 py-1 border rounded"
+                >
+                    <option value={5}>5 per page</option>
+                    <option value={10}>10 per page</option>
+                    <option value={20}>20 per page</option>
+                    <option value={50}>50 per page</option>
+                </select>
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">
-              {searchTerm || statusFilter !== "all" ? "No matching complaints" : "No complaints found"}
-            </h3>
-            <p className="text-gray-600">
-              {searchTerm || statusFilter !== "all" 
-                ? "Try adjusting your search or filter criteria" 
-                : `No ${page.toLowerCase()} complaints have been submitted yet`}
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+        );
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50 p-6">
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="bg-white rounded-lg shadow p-6 mb-6">
+                    <h1 className="text-2xl font-bold text-gray-800 mb-2">
+                        {page} Complaints
+                    </h1>
+                    <p className="text-gray-600 mb-6">
+                        Manage and resolve {page.toLowerCase()} complaints
+                    </p>
+                    
+                    {/* Stats */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                            <div className="text-2xl font-bold text-blue-700">
+                                {stats.total}
+                            </div>
+                            <div className="text-sm text-gray-600">Total Complaints</div>
+                        </div>
+                        <div className="bg-green-50 p-4 rounded-lg">
+                            <div className="text-2xl font-bold text-green-700">
+                                {stats.resolved}
+                            </div>
+                            <div className="text-sm text-gray-600">Resolved</div>
+                        </div>
+                        <div className="bg-yellow-50 p-4 rounded-lg">
+                            <div className="text-2xl font-bold text-yellow-700">
+                                {stats.pending}
+                            </div>
+                            <div className="text-sm text-gray-600">Pending</div>
+                        </div>
+                    </div>
+                    
+                    {/* Search and Filter */}
+                    <div className="flex flex-col md:flex-row gap-4 mb-6">
+                        <div className="relative flex-1">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search complaints..."
+                                className="pl-10 pr-4 py-2 w-full border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <select
+                            className="border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                        >
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+                    </div>
+                </div>
+                
+                {/* Complaints List */}
+                {isLoading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <FontAwesomeIcon icon={faSpinner} spin className="text-3xl text-blue-500" />
+                    </div>
+                ) : filteredComplaints.length === 0 ? (
+                    <div className="bg-white rounded-lg shadow p-8 text-center">
+                        <FontAwesomeIcon 
+                            icon={faExclamationTriangle} 
+                            className="text-yellow-400 text-4xl mb-4" 
+                        />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                            No complaints found
+                        </h3>
+                        <p className="text-gray-500">
+                            {searchTerm || statusFilter !== 'all' 
+                                ? 'Try adjusting your search or filter criteria.'
+                                : 'There are no complaints to display at this time.'}
+                        </p>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {filteredComplaints.map(complaint => (
+                            <div key={complaint._id} className="bg-white rounded-lg shadow overflow-hidden">
+                                <div className={`p-4 ${
+                                    complaint.resolved 
+                                        ? 'bg-green-50 border-l-4 border-green-500' 
+                                        : 'bg-yellow-50 border-l-4 border-yellow-500'
+                                }`}>
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className="font-medium text-gray-900">
+                                                {complaint.name} ({complaint.rollno})
+                                            </h3>
+                                            <p className="text-sm text-gray-500">
+                                                {complaint.email} • {complaint.phone}
+                                            </p>
+                                        </div>
+                                        <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                                            complaint.resolved 
+                                                ? 'bg-green-100 text-green-800' 
+                                                : 'bg-yellow-100 text-yellow-800'
+                                        }`}>
+                                            {complaint.resolved ? 'Resolved' : 'Pending'}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div className="p-4 border-t">
+                                    <p className="text-gray-700 mb-4">
+                                        {complaint.complaintdesc}
+                                    </p>
+                                    
+                                    {!complaint.resolved && (
+                                        <div className="mt-4 pt-4 border-t">
+                                            <label htmlFor={`comment-${complaint._id}`} className="block text-sm font-medium text-gray-700 mb-2">
+                                                Resolution Notes
+                                            </label>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    id={`comment-${complaint._id}`}
+                                                    value={comments[complaint._id] || ''}
+                                                    onChange={(e) => handleCommentChange(e, complaint._id)}
+                                                    className="flex-1 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                    placeholder="Add resolution notes..."
+                                                />
+                                                <button
+                                                    onClick={(e) => handleResolve(e, complaint._id)}
+                                                    disabled={!comments[complaint._id]?.trim() || processingIds.has(complaint._id)}
+                                                    className={`px-4 py-2 rounded-lg font-medium text-white ${
+                                                        !comments[complaint._id]?.trim() || processingIds.has(complaint._id)
+                                                            ? 'bg-gray-400 cursor-not-allowed'
+                                                            : 'bg-green-600 hover:bg-green-700'
+                                                    }`}
+                                                >
+                                                    {processingIds.has(complaint._id) ? (
+                                                        <FontAwesomeIcon icon={faSpinner} spin />
+                                                    ) : (
+                                                        'Resolve'
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    {complaint.resolved && complaint.resolvedAt && (
+                                        <div className="mt-4 pt-4 border-t">
+                                            <div className="text-sm text-gray-500">
+                                                <p className="font-medium">Resolved on {new Date(complaint.resolvedAt).toLocaleDateString()}</p>
+                                                {complaint.resolutionNotes && (
+                                                    <p className="mt-1">
+                                                        <span className="font-medium">Notes:</span> {complaint.resolutionNotes}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                        
+                        {/* Pagination */}
+                        {pagination.totalPages > 1 && renderPagination()}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 }
