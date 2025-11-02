@@ -40,7 +40,7 @@ export default function Complaint() {
         setIsLoading(true);
         try {
             // The backend expects the complaint type as a URL parameter and pagination as query params
-            const url = `${apiUrl}/hostel/Complaint/${page || 'all'}?page=${pageNumber}&limit=${pagination.itemsPerPage}`;
+            const url = `${apiUrl}/hostel/Complaint/${page || 'all'}?page=${pageNumber}&limit=${pagination.itemsPerPage}${statusFilter && statusFilter !== 'all' ? `&status=${encodeURIComponent(statusFilter)}` : ''}${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`;
             console.log('Fetching complaints from:', url);
             
             const response = await fetch(url, {
@@ -174,7 +174,7 @@ export default function Complaint() {
     // Initial data fetch
     useEffect(() => {
         fetchComplaints(1);
-    }, [page, pagination.itemsPerPage]);
+    }, [page, pagination.itemsPerPage, statusFilter, searchTerm]);
 
     // Render pagination controls
     const renderPagination = () => {

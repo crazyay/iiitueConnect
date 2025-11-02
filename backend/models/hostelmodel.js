@@ -9,10 +9,23 @@ const hostelSchema=mongoose.Schema({
     feeamount:String,
     feerec:String,
     feepdf:String,
-    status:{
-        type:String,
-        default:false
+    // Track status consistently: pending, approved, rejected
+    status: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending'
     }
+
+    ,
+    approved: {
+        type: Boolean,
+        default: false
+    },
+    comment: {
+        type: String,
+        default: ''
+    },
+    approvedAt: Date
 
 }, { timestamps: true })
 module.exports=mongoose.model('hostelreg',hostelSchema);

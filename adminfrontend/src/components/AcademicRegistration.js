@@ -35,7 +35,8 @@ function AcademicRegistration() {
     const [filters, setFilters] = useState({
         batch: "",
         semester: "",
-        branch: ""
+        branch: "",
+        status: 'all'
     });
     
     // Search state
@@ -48,14 +49,15 @@ function AcademicRegistration() {
             const queryParams = new URLSearchParams({
                 page: pagination.currentPage,
                 limit: pagination.itemsPerPage,
-                ...(searchTerm && { search: searchTerm }),
                 ...(filters.batch && { batch: filters.batch }),
                 ...(filters.semester && { semester: filters.semester }),
-                ...(filters.branch && { branch: filters.branch })
+                ...(filters.branch && { branch: filters.branch }),
+                ...(filters.status && filters.status !== 'all' && { status: filters.status }),
+                ...(searchTerm && { search: searchTerm })
             });
 
             const response = await fetch(
-                `${apiUrl}/api/academic/registrations?${queryParams}`,
+                `${apiUrl}/academic/academicregistration?${queryParams}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -93,9 +95,9 @@ function AcademicRegistration() {
             const comment = comments[id] || '';
 
             const response = await fetch(
-                `${apiUrl}/api/academic/approve/${id}`,
+                `${apiUrl}/academic/academicregistrationapproval/${id}`,
                 {
-                    method: 'POST',
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -136,7 +138,8 @@ function AcademicRegistration() {
         setFilters({
             batch: '',
             semester: '',
-            branch: ''
+            branch: '',
+            status: 'all'
         });
         setSearchTerm('');
     };
@@ -172,10 +175,10 @@ function AcademicRegistration() {
         }));
     };
 
-    // Fetch registrations when component mounts or when pagination/filters change
+    // Fetch registrations when component mounts or when pagination/filters/search change
     useEffect(() => {
         fetchRegistrations();
-    }, [pagination.currentPage, pagination.itemsPerPage]);
+    }, [pagination.currentPage, pagination.itemsPerPage, filters, searchTerm]);
 
     // Render pagination controls
     const renderPagination = () => {
@@ -298,6 +301,17 @@ function AcademicRegistration() {
         );
     };
 
+    // Format date/time for display
+    const formatDateTime = (dateString) => {
+        if (!dateString) return 'N/A';
+        try {
+            const d = new Date(dateString);
+            return d.toLocaleString();
+        } catch (e) {
+            return dateString;
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
@@ -355,6 +369,20 @@ function AcademicRegistration() {
                                 placeholder="e.g. 2023"
                                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select
+                                name="status"
+                                value={filters.status}
+                                onChange={handleFilterChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="all">All</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
                         </div>
                         
                         <div>
@@ -448,14 +476,17 @@ function AcademicRegistration() {
                                                 <div className="text-sm text-gray-500">
                                                     Batch: {registration.batch || 'N/A'}
                                                 </div>
+                                                <div className="text-sm text-gray-500">
+                                                    Registered: {formatDateTime(registration.createdAt)}
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                    registration.status 
+                                                    registration.status === 'approved' 
                                                         ? 'bg-green-100 text-green-800' 
                                                         : 'bg-yellow-100 text-yellow-800'
                                                 }`}>
-                                                    {registration.status ? 'Approved' : 'Pending'}
+                                                    {registration.status === 'approved' ? 'Approved' : 'Pending'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -468,7 +499,7 @@ function AcademicRegistration() {
                                                         <FontAwesomeIcon icon={faEye} className="mr-1" /> View Receipt
                                                     </button>
                                                     
-                                                    {!registration.status && (
+                                                    {registration.status !== 'approved' && (
                                                         <div className="mt-2">
                                                             <textarea
                                                                 value={comments[registration._id] || ''}

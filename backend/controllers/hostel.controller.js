@@ -55,11 +55,24 @@ const getHostelRegistration = asyncHandler(async (req, res) => {
         const skip = (page - 1) * limit;
         
         console.log(`Fetching page ${page} with limit ${limit}, skip ${skip}`);
-        
+        // Build query with optional status/search filters
+        const query = {};
+        const { status, search } = req.query;
+        if (status && status !== 'all') query.status = status;
+        if (search) {
+            const s = new RegExp(search, 'i');
+            query.$or = [
+                { name: s },
+                { rollno: s },
+                { email: s },
+                { hostelname: s }
+            ];
+        }
+
         // Get total count and paginated results in parallel
         const [total, registeredStudents] = await Promise.all([
-            hostelmodel.countDocuments(),
-            hostelmodel.find()
+            hostelmodel.countDocuments(query),
+            hostelmodel.find(query)
                 .skip(skip)
                 .limit(limit)
                 .sort({ createdAt: -1 })
@@ -102,13 +115,24 @@ const complaints=asyncHandler(async(req,res)=>{
 const getComplaints = asyncHandler(async (req, res) => {
     try {
         console.log('Received complaints request with params:', req.params, 'query:', req.query);
-        
         const type = req.params.page;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
-        
-        const query = type ? { type: { $regex: new RegExp(type, "i") } } : {};
+
+        // Build query: type (from URL param), status and search (from query)
+        const query = type && type !== 'all' ? { type: { $regex: new RegExp(type, "i") } } : {};
+        const { status, search } = req.query;
+        if (status && status !== 'all') query.status = status;
+        if (search) {
+            const s = new RegExp(search, 'i');
+            query.$or = [
+                { name: s },
+                { rollno: s },
+                { email: s },
+                { complaintdesc: s }
+            ];
+        }
         
         console.log('Querying complaints with:', { type, page, limit, skip, query });
         
@@ -146,15 +170,24 @@ const getComplaints = asyncHandler(async (req, res) => {
     }
 })
 const hostelRegistrationApproved=asyncHandler(async(req,res)=>{
-    // console.log(req.params.id);
-    const response=await hostelmodel.findByIdAndUpdate(req.params.id, {$set:{status:true}},{new:true})
-    // console.log(response);     
-   res.json("Hostel Registration approved")
+    // Approve hostel registration by updating status
+    const update = { status: 'approved', approved: true, approvedAt: new Date() };
+    if (req.body && req.body.comment) update.comment = req.body.comment;
+
+    const response = await hostelmodel.findByIdAndUpdate(req.params.id, { $set: update }, { new: true });
+    res.json({ success: true, message: 'Hostel registration approved', data: response });
 })
 const complaintResolved=asyncHandler(async(req,res)=>{
-    res.status(200).json("complaint resolved and deleted")
-    await complaintmodel.findByIdAndDelete(req.params.id);
-}
-)
+    // Mark complaint resolved instead of deleting
+    const update = {
+        status: 'resolved',
+        resolved: true,
+        resolutionNotes: req.body?.comment || '',
+        resolvedAt: new Date()
+    };
+
+    const updated = await complaintmodel.findByIdAndUpdate(req.params.id, { $set: update }, { new: true });
+    res.status(200).json({ success: true, message: 'Complaint resolved', data: updated });
+});
 
 module.exports={hostelRegistration,complaints,getComplaints,getHostelRegistration,hostelRegistrationApproved,complaintResolved}
