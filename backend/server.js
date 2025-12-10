@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors({ 
-  origin: ['https://iiitue-connect-student-frontend.vercel.app','https://iiitue-connect-staff-frontend.vercel.app','http://localhost:3000','http://localhost:3001'],
+  origin: ['https://iiitue-connect-student-frontend.vercel.app','https://iiitue-connect-staff-frontend.vercel.app'],
     optionsSuccessStatus: 200,
     credentials: true,
 }));
